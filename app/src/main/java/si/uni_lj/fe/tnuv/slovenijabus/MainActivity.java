@@ -6,8 +6,11 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -17,8 +20,8 @@ public class MainActivity extends AppCompatActivity {
     private Calendar calendar;
     private int year, month, day;
     private TextView dateView;
-    private EditText entryView;
-    private EditText exitView;
+    private AutoCompleteTextView entryView;
+    private AutoCompleteTextView exitView;
 
     public static final String EXTRA_DATE = "intentData.DATE";
     public static final String EXTRA_ENTRY = "intentData.ENTRY";
@@ -28,6 +31,10 @@ public class MainActivity extends AppCompatActivity {
             "https://www.ap-ljubljana.si/_vozni_red/get_vozni_red_0.php"; // POST request
     public static final String API_postaje =
             "https://www.ap-ljubljana.si/_vozni_red/get_postajalisca_vsa_v2.php"; // GET request
+
+    private String[] postaje = new String[]{
+            "Hajdrihova", "Domžale", "Zagorje", "Ljubljana", "Vir pri Domžalah"};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +52,13 @@ public class MainActivity extends AppCompatActivity {
 
         entryView = findViewById(R.id.vstopna_vnos);
         exitView = findViewById(R.id.izstopna_vnos);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line, postaje);
+        entryView.setAdapter(adapter);
+        exitView.setAdapter(adapter);
+
+
     }
 
     public void setDate(View view) {
