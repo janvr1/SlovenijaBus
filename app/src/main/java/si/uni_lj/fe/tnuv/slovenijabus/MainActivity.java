@@ -28,7 +28,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity implements DownloadCallback {
 
     private Calendar calendar;
-    private int year, month, day;
+    private int year, month, day, end_day;
     private TextView dateView;
     private AutoCompleteTextView entryView;
     private AutoCompleteTextView exitView;
@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         year = calendar.get(Calendar.YEAR);
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
+        end_day = calendar.get(Calendar.DAY_OF_MONTH +14); // Datum za do dva tedna v naprej
 
         dateView = findViewById(R.id.datum_vnos);
         dateView.setText(dateStringBuilder(year, month, day));
