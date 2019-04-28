@@ -8,4 +8,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- Stil za date picker => popravi, da okno pokaže samo dva tedna -->
+
 </resources>
