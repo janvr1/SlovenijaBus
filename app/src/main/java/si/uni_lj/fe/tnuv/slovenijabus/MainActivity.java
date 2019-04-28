@@ -37,8 +37,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     public static final String EXTRA_ENTRY = "intentData.ENTRY";
     public static final String EXTRA_EXIT = "intentData.EXIT";
 
-    public static final String API_voznired =
-            "https://www.ap-ljubljana.si/_vozni_red/get_vozni_red_0.php"; // POST request
     public static final String API_postaje =
             "https://www.ap-ljubljana.si/_vozni_red/get_postajalisca_vsa_v2.php"; // GET request
 
