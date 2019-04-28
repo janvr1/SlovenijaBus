@@ -3,4 +3,5 @@
     <string name="exit_station">Izstopna postaja</string>
     <string name="entry_station">Vstopna postaja</string>
     <string name="showAll_button">Prikaži vse</string>
+    <string name="network_error_message">Ni omrežne povezave</string>
 </resources>

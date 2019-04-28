@@ -2,7 +2,11 @@ package si.uni_lj.fe.tnuv.slovenijabus;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,10 +16,14 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DownloadCallback {
 
     private Calendar calendar;
     private int year, month, day;
@@ -32,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String API_postaje =
             "https://www.ap-ljubljana.si/_vozni_red/get_postajalisca_vsa_v2.php"; // GET request
 
-    private String[] postaje = new String[]{
-            "Hajdrihova", "Domžale", "Zagorje", "Ljubljana", "Vir pri Domžalah"};
+    public String postaje_test = "Hajdrihova, Domžale, Zagorje, Ljubljana, Vir pri Domžalah";
+    public List<String> postaje_list = new ArrayList<>(Arrays.asList(postaje_test.split(",")));
 
 
     @Override
@@ -43,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
-
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
 
@@ -53,12 +60,7 @@ public class MainActivity extends AppCompatActivity {
         entryView = findViewById(R.id.vstopna_vnos);
         exitView = findViewById(R.id.izstopna_vnos);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, postaje);
-        entryView.setAdapter(adapter);
-        exitView.setAdapter(adapter);
-
-
+        getStationsFromAPI();
     }
 
     public void setDate(View view) {
@@ -95,5 +97,49 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_EXIT, exitStation);
         intent.putExtra(EXTRA_DATE, date);
         startActivity(intent);
+    }
+
+    @Override
+    public void updateFromDownload(Object result) {
+        String stations_string = (String) result;
+        List<String> stations_list = new ArrayList<>(Arrays.asList(stations_string
+                .split("\n")));
+        postaje_list = stations_list;
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line, postaje_list);
+        entryView.setAdapter(adapter);
+        exitView.setAdapter(adapter);
+
+
+        TextView test = findViewById(R.id.testView);
+        Toast.makeText(this, stations_string, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public NetworkInfo getActiveNetworkInfo() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo;
+    }
+
+    @Override
+    public void onProgressUpdate(int progressCode, int percentComplete) {
+    }
+
+    @Override
+    public void finishDownloading() {
+    }
+
+
+    public void getStationsFromAPI() {
+        NetworkInfo netInfo = getActiveNetworkInfo();
+
+        if (netInfo != null && netInfo.isConnected()) {
+            new DownloadAsyncTask(this).execute(API_postaje);
+        } else {
+            Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_SHORT).show();
+        }
     }
 }
