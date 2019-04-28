@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
     public ArrayList<String> station_names = new ArrayList<>();
     public static Map<String, String> stations_map = new HashMap<>();
-    public static Map<String, String> stations_map_reverse = new HashMap<>();
+    //public static Map<String, String> stations_map_reverse = new HashMap<>();
 
 
     @Override
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
-        month = calendar.get(Calendar.MONTH);
+        month = calendar.get(Calendar.MONTH) + 1; // Android šteje meseco od 0, zato +1
         day = calendar.get(Calendar.DAY_OF_MONTH);
         end_day = calendar.get(Calendar.DAY_OF_MONTH) + 14; // Datum za do dva tedna v naprej
 
@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         return day + "." + month + "." + year;
     }
 
+
     public void launchShowAll(View view) {
         String entryStation = entryView.getText().toString();
         String exitStation = exitView.getText().toString();
@@ -105,20 +106,37 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         startActivity(intent);
     }
 
+
+    public void getStationsFromAPI() {
+        NetworkInfo netInfo = getActiveNetworkInfo();
+
+        if (netInfo != null && netInfo.isConnected()) {
+            new DownloadAsyncTask(this).execute(API_postaje);
+        } else {
+            Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void swapStations(View view) {
+        String entry = entryView.getText().toString();
+        String exit = exitView.getText().toString();
+        entryView.setText(exit);
+        exitView.setText(entry);
+    }
+
     @Override
     public void updateFromDownload(Object result) {
         String stations_string = (String) result;
         String[] splitted = stations_string.split("\n");
         Toast.makeText(this, Character.toString(splitted[1].charAt(0)), Toast.LENGTH_SHORT).show();
-        for (int i = 1; i < splitted.length - 1; i++) {
+        for (int i = 1; i < splitted.length; i++) {
             String current = splitted[i];
             if (current.charAt(0) == "0".charAt(0)) {
                 String x = current.substring(current.indexOf(":") + 1);
                 String[] separated = x.split("\\|");
                 stations_map.put(separated[1], separated[0]);
-                stations_map_reverse.put(separated[0], separated[1]);
+                stations_map.put(separated[0], separated[1]);
                 station_names.add(separated[1]);
-
             }
         }
 
@@ -144,22 +162,5 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
     @Override
     public void finishDownloading() {
-    }
-
-    public void getStationsFromAPI() {
-        NetworkInfo netInfo = getActiveNetworkInfo();
-
-        if (netInfo != null && netInfo.isConnected()) {
-            new DownloadAsyncTask(this).execute(API_postaje);
-        } else {
-            Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void swapStations(View view) {
-        String entry = entryView.getText().toString();
-        String exit = exitView.getText().toString();
-        entryView.setText(exit);
-        exitView.setText(entry);
     }
 }

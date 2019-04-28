@@ -24,7 +24,6 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
             "https://www.ap-ljubljana.si/_vozni_red/get_linija_info_0.php"; // POST request
 
     private String request_data;
-    private String voznired_response;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,12 +38,12 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
         request_data = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date;
         getTimetablesFromAPI();
 
-        String entryName = MainActivity.stations_map_reverse.get(entryStationID);
-        String exitName = MainActivity.stations_map_reverse.get(exitStationID);
+        String entryName = MainActivity.stations_map.get(entryStationID);
+        String exitName = MainActivity.stations_map.get(exitStationID);
 
         TextView title = findViewById(R.id.show_all_title);
         title.setText("Vozni red: " + entryName + " do " + exitName);
-        Toast.makeText(this, "Download voznih redov uspešen :)", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Request string: " + request_data, Toast.LENGTH_LONG).show();
 
     }
 
@@ -61,7 +60,7 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
         String[] splitted = input.split("\n");
         ArrayList<HashMap<String, String>> output = new ArrayList<>();
 
-        for (int i = 0; i < splitted.length - 1; i++) {
+        for (int i = 0; i < splitted.length; i++) {
             String[] separated = splitted[i].split("\\|");
             HashMap<String, String> timetable = new HashMap<>();
             timetable.put("entry_time", separated[6]);
@@ -75,7 +74,7 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
 
     @Override
     public void updateFromDownload(Object result) {
-        voznired_response = (String) result;
+        String voznired_response = (String) result;
         //Toast.makeText(this, voznired_response, Toast.LENGTH_SHORT).show();
         ArrayList<HashMap<String, String>> timetable = timetableParser(voznired_response);
 
