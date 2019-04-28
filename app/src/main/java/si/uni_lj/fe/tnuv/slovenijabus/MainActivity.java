@@ -21,7 +21,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements DownloadCallback {
 
@@ -40,8 +42,8 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     public static final String API_postaje =
             "https://www.ap-ljubljana.si/_vozni_red/get_postajalisca_vsa_v2.php"; // GET request
 
-    public String postaje_test = "Hajdrihova, Domžale, Zagorje, Ljubljana, Vir pri Domžalah";
-    public List<String> postaje_list = new ArrayList<>(Arrays.asList(postaje_test.split(",")));
+    public ArrayList<String> station_names = new ArrayList<String>();
+    public Map<String, String> stations_map = new HashMap<String, String>();
 
 
     @Override
@@ -93,8 +95,8 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         String exitStation = exitView.getText().toString();
         String date = dateView.getText().toString();
         Intent intent = new Intent(this, showAllActivity.class);
-        intent.putExtra(EXTRA_ENTRY, entryStation);
-        intent.putExtra(EXTRA_EXIT, exitStation);
+        intent.putExtra(EXTRA_ENTRY, stations_map.get(entryStation));
+        intent.putExtra(EXTRA_EXIT, stations_map.get(exitStation));
         intent.putExtra(EXTRA_DATE, date);
         startActivity(intent);
     }
@@ -102,18 +104,21 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     @Override
     public void updateFromDownload(Object result) {
         String stations_string = (String) result;
-        List<String> stations_list = new ArrayList<>(Arrays.asList(stations_string
-                .split("\n")));
-        postaje_list = stations_list;
+        String[] splitted = stations_string.split("\n");
+
+        for (int i = 1; i < splitted.length - 1; i++) {
+            String x = splitted[i].substring(splitted[i].indexOf(":") + 1);
+            String[] separated = x.split("\\|");
+            stations_map.put(separated[1], separated[0]);
+            station_names.add(separated[1]);
+        }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, postaje_list);
+                android.R.layout.simple_dropdown_item_1line, station_names);
         entryView.setAdapter(adapter);
         exitView.setAdapter(adapter);
 
-
-        TextView test = findViewById(R.id.testView);
-        Toast.makeText(this, stations_string, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Download postaj usepešen :)", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -131,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     @Override
     public void finishDownloading() {
     }
-
 
     public void getStationsFromAPI() {
         NetworkInfo netInfo = getActiveNetworkInfo();
