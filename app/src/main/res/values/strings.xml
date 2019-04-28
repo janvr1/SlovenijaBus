@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">SlovenijaBus</string>
+    //activity_main.xml
     <string name="exit_station">Izstopna postaja</string>
     <string name="entry_station">Vstopna postaja</string>
     <string name="showAll_button">Prikaži vse</string>
+    <string name="showSingle_button">Najdi</string>
     <string name="network_error_message">Ni omrežne povezave</string>
+    <string name="app_name">SlovenijaBus</string>
 </resources>
