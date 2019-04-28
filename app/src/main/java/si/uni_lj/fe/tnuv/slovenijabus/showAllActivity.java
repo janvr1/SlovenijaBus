@@ -4,13 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class showAllActivity extends AppCompatActivity implements DownloadCallback {
 
@@ -29,12 +33,18 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
 
         Intent intent = getIntent();
         String date = intent.getStringExtra(MainActivity.EXTRA_DATE);
-        String entryStation = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
-        String exitStation = intent.getStringExtra(MainActivity.EXTRA_EXIT);
+        String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
+        String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
 
-        request_data = "VSTOP_ID=" + entryStation + "&IZSTOP_ID=" + exitStation + "&DATUM=" + date;
+        request_data = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date;
         getTimetablesFromAPI();
-        //Toast.makeText(this, merged, Toast.LENGTH_LONG).show();
+
+        String entryName = MainActivity.stations_map_reverse.get(entryStationID);
+        String exitName = MainActivity.stations_map_reverse.get(exitStationID);
+
+        TextView title = findViewById(R.id.show_all_title);
+        title.setText("Vozni red: " + entryName + " do " + exitName);
+        Toast.makeText(this, "Download voznih redov uspešen :)", Toast.LENGTH_LONG).show();
 
     }
 
@@ -47,22 +57,33 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
         }
     }
 
-    public ArrayList<String[]> timeTableParser(String input) {
+    public ArrayList<HashMap<String, String>> timetableParser(String input) {
         String[] splitted = input.split("\n");
-        ArrayList<String[]> timetable = new ArrayList<String[]>();
+        ArrayList<HashMap<String, String>> output = new ArrayList<>();
 
         for (int i = 0; i < splitted.length - 1; i++) {
             String[] separated = splitted[i].split("\\|");
-            timetable.add(separated);
+            HashMap<String, String> timetable = new HashMap<>();
+            timetable.put("entry_time", separated[6]);
+            timetable.put("exit_time", separated[7]);
+            timetable.put("duration", separated[8]);
+            output.add(timetable);
         }
-        return timetable;
+        return output;
     }
 
 
     @Override
     public void updateFromDownload(Object result) {
         voznired_response = (String) result;
-        Toast.makeText(this, voznired_response, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, voznired_response, Toast.LENGTH_SHORT).show();
+        ArrayList<HashMap<String, String>> timetable = timetableParser(voznired_response);
+
+        ListView lv = findViewById(R.id.show_all_list);
+        ListAdapter adapter = new SimpleAdapter(this, timetable, R.layout.show_all_list_item,
+                new String[]{"entry_time", "exit_time", "duration"},
+                new int[]{R.id.entry_time, R.id.exit_time, R.id.duration});
+        lv.setAdapter(adapter);
     }
 
     @Override

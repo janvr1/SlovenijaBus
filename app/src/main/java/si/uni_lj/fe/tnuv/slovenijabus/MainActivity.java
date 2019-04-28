@@ -40,8 +40,9 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     public static final String API_postaje =
             "https://www.ap-ljubljana.si/_vozni_red/get_postajalisca_vsa_v2.php"; // GET request
 
-    public ArrayList<String> station_names = new ArrayList<String>();
-    public Map<String, String> stations_map = new HashMap<String, String>();
+    public ArrayList<String> station_names = new ArrayList<>();
+    public static Map<String, String> stations_map = new HashMap<>();
+    public static Map<String, String> stations_map_reverse = new HashMap<>();
 
 
     @Override
@@ -53,13 +54,17 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         year = calendar.get(Calendar.YEAR);
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
-        end_day = calendar.get(Calendar.DAY_OF_MONTH +14); // Datum za do dva tedna v naprej
+        end_day = calendar.get(Calendar.DAY_OF_MONTH) + 14; // Datum za do dva tedna v naprej
 
         dateView = findViewById(R.id.datum_vnos);
         dateView.setText(dateStringBuilder(year, month, day));
 
         entryView = findViewById(R.id.vstopna_vnos);
         exitView = findViewById(R.id.izstopna_vnos);
+
+        entryView.setText("Vir pri Domžalah in Vir Cerkev");  //Samo za testne namene
+        exitView.setText("LJUBLJANA AVTOBUSNA POSTAJA");
+
 
         getStationsFromAPI();
     }
@@ -104,15 +109,20 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     public void updateFromDownload(Object result) {
         String stations_string = (String) result;
         String[] splitted = stations_string.split("\n");
-
+        Toast.makeText(this, Character.toString(splitted[1].charAt(0)), Toast.LENGTH_SHORT).show();
         for (int i = 1; i < splitted.length - 1; i++) {
-            String x = splitted[i].substring(splitted[i].indexOf(":") + 1);
-            String[] separated = x.split("\\|");
-            stations_map.put(separated[1], separated[0]);
-            station_names.add(separated[1]);
+            String current = splitted[i];
+            if (current.charAt(0) == "0".charAt(0)) {
+                String x = current.substring(current.indexOf(":") + 1);
+                String[] separated = x.split("\\|");
+                stations_map.put(separated[1], separated[0]);
+                stations_map_reverse.put(separated[0], separated[1]);
+                station_names.add(separated[1]);
+
+            }
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, station_names);
         entryView.setAdapter(adapter);
         exitView.setAdapter(adapter);
@@ -144,5 +154,12 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         } else {
             Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void swapStations(View view) {
+        String entry = entryView.getText().toString();
+        String exit = exitView.getText().toString();
+        entryView.setText(exit);
+        exitView.setText(entry);
     }
 }
