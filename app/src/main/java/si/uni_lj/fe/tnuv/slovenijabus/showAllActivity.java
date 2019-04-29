@@ -89,6 +89,11 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
         HashMap<String, Object> result = (HashMap<String, Object>) res;
         HashMap<String, String> request = (HashMap<String, String>) result.get("request");
 
+        if (result.get("response").equals("error")) {
+            Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_LONG).show();
+            return;
+        }
+
         if (request.get("url").equals(API_voznired)) {
             String voznired_response = (String) result.get("response");
             ArrayList<HashMap<String, String>> timetable = timetableParser(voznired_response);

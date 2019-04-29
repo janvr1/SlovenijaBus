@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         exitView.setText(entry);
     }
 
-    public ArrayList<String> station_parser(String input) {
+    public ArrayList<String> stationParser(String input) {
         ArrayList<String> station_names = new ArrayList<>();
         String[] splitted = input.split("\n");
 
@@ -143,9 +143,14 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         HashMap<String, Object> result = (HashMap<String, Object>) res;
         HashMap<String, String> request = (HashMap<String, String>) result.get("request");
 
+        if (result.get("response").equals("error")) {
+            Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_LONG).show();
+            return;
+        }
+
         if (request.get("url").equals(API_postaje)) {
             String stations_string = (String) result.get("response");
-            ArrayList<String> station_names = station_parser(stations_string);
+            ArrayList<String> station_names = stationParser(stations_string);
 
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                     android.R.layout.simple_dropdown_item_1line, station_names);

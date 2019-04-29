@@ -6,9 +6,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class showSingleActivity extends AppCompatActivity implements DownloadCallback {
@@ -31,7 +33,6 @@ public class showSingleActivity extends AppCompatActivity implements DownloadCal
         request.put("url", API_podatki_relacija);
         request.put("method", "POST");
         request.put("data", "flags=" + data);
-
         makeHttpRequest(request);
     }
 
@@ -44,13 +45,36 @@ public class showSingleActivity extends AppCompatActivity implements DownloadCal
         }
     }
 
+    public ArrayList<String> lineDataParser(String input) {
+        String[] splitted = input.split("0\\|\\|\\|");
+        ArrayList<String> output = new ArrayList<>();
+        for (String s : splitted) {
+            s = s.replace("|", " ");
+            output.add(s.trim());
+        }
+        return output;
+    }
+
 
     @Override
     public void updateFromDownload(Object res) {
-        TextView textView = findViewById(R.id.textView);
         HashMap<String, Object> result = (HashMap<String, Object>) res;
-        String line_response = (String) result.get("response");
-        textView.setText(line_response);
+        HashMap<String, String> request = (HashMap<String, String>) result.get("request");
+
+        if (result.get("response").equals("error")) {
+            Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (request.get("url").equals(API_podatki_relacija)) {
+            String line_data_str = (String) result.get("response");
+            ArrayList<String> line_data = lineDataParser(line_data_str);
+            ListView lv = findViewById(R.id.show_single_list);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
+                    line_data);
+            lv.setAdapter(adapter);
+        }
+
     }
 
 
