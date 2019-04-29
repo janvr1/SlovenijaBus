@@ -5,54 +5,56 @@ import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 
-public class DownloadAsyncTask extends AsyncTask<String, Void, String> {
+public class DownloadAsyncTask extends AsyncTask<HashMap<String, String>, Void, HashMap<String, Object>> {
     private static final String DEBUG_TAG = DownloadAsyncTask.class.getSimpleName();
 
     private DownloadCallback caller;
-
-    // Tole je konstruktor. Ob ustvarjanju objekta iz tega razreda mora klicatelj (uporabnik tega razreda)
-    // posredovati sklic nase, tako da ga lahko ta razred obvešča o napredku.
-    // Klicatelj je lahko vsak razred, ki deduje (izdela) vmesnik DownloadCallback
 
     DownloadAsyncTask(DownloadCallback caller) {
         this.caller = caller;
     }
 
     @Override
-    protected String doInBackground(String... urls) {
-
-        // params comes from the execute() call: params[0] is the url.
+    protected HashMap<String, Object> doInBackground(HashMap<String, String>... in) {
+        HashMap input = in[0];
         try {
-            return downloadUrl(urls[0]);
+            return downloadUrl(input);
         } catch (IOException e) {
-            return "Unable to retrieve web page. URL may be invalid.";
+            HashMap<String, Object> error = new HashMap<>();
+            error.put("response", "error");
+            error.put("request", input);
+            return error;
         }
     }
 
     // onPostExecute displays the results of the AsyncTask.
     @Override
-    protected void onPostExecute(String result) {
+    protected void onPostExecute(HashMap<String, Object> result) {
         caller.updateFromDownload(result);
     }
 
-    private String downloadUrl(String myurl) throws IOException {
+    private HashMap<String, Object> downloadUrl(HashMap<String, String> input) throws IOException {
         InputStream inputStream = null;
 
         try {
-            URL url = new URL(myurl);
+            URL url = new URL(input.get("url"));
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10000 /* milliseconds */);
             conn.setConnectTimeout(15000 /* milliseconds */);
-            conn.setRequestMethod("GET");
+            conn.setRequestMethod(input.get("method"));
             conn.setDoInput(true);
+            if (input.get("method").equals("POST")) {
+                DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+                out.writeBytes(input.get("data"));
+            }
             // Starts the query
             conn.connect();
 
@@ -65,7 +67,12 @@ public class DownloadAsyncTask extends AsyncTask<String, Void, String> {
             // Convert the InputStream into a string
             String contentAsString = convertStreamToString(inputStream);
             Log.d(DEBUG_TAG, "Vsebina: " + contentAsString);
-            return contentAsString;
+            HashMap<String, Object> result = new HashMap();
+            result.put("response", contentAsString);
+            result.put("request", input);
+
+            return result;
+
         } finally {
             if (inputStream != null) {
                 inputStream.close();

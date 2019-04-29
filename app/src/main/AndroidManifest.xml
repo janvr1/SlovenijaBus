@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DownloadAsyncTask"></activity>
+        <activity android:name=".showSingleActivity"></activity>
+        <activity android:name=".DownloadAsyncTask" />
         <activity android:name=".showAllActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

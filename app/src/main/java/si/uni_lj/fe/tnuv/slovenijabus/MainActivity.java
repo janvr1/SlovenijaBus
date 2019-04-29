@@ -6,23 +6,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements DownloadCallback {
@@ -40,10 +35,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     public static final String API_postaje =
             "https://www.ap-ljubljana.si/_vozni_red/get_postajalisca_vsa_v2.php"; // GET request
 
-    public ArrayList<String> station_names = new ArrayList<>();
     public static Map<String, String> stations_map = new HashMap<>();
-    //public static Map<String, String> stations_map_reverse = new HashMap<>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +44,9 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
-        month = calendar.get(Calendar.MONTH) + 1; // Android šteje meseco od 0, zato +1
+        month = calendar.get(Calendar.MONTH) + 1; // Android šteje mesece od 0, zato +1
         day = calendar.get(Calendar.DAY_OF_MONTH);
-        end_day = calendar.get(Calendar.DAY_OF_MONTH) + 14; // Datum za do dva tedna v naprej
+        end_day = calendar.get(Calendar.DAY_OF_MONTH) + 14; // Datum za do dva tedna v naprej <—— To ne bo dobr delal, če je do konca meseca manj kot dva tedna ;)
 
         dateView = findViewById(R.id.datum_vnos);
         dateView.setText(dateStringBuilder(year, month, day));
@@ -64,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
         entryView.setText("Vir pri Domžalah in Vir Cerkev");  //Samo za testne namene
         exitView.setText("LJUBLJANA AVTOBUSNA POSTAJA");
-
 
         getStationsFromAPI();
     }
@@ -107,14 +98,20 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     }
 
 
-    public void getStationsFromAPI() {
+    public void makeHttpRequest(HashMap<String, String> request) {
         NetworkInfo netInfo = getActiveNetworkInfo();
-
         if (netInfo != null && netInfo.isConnected()) {
-            new DownloadAsyncTask(this).execute(API_postaje);
+            new DownloadAsyncTask(this).execute(request);
         } else {
             Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void getStationsFromAPI() {
+        HashMap<String, String> req = new HashMap<>();
+        req.put("url", API_postaje);
+        req.put("method", "GET");
+        makeHttpRequest(req);
     }
 
     public void swapStations(View view) {
@@ -124,11 +121,10 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         exitView.setText(entry);
     }
 
-    @Override
-    public void updateFromDownload(Object result) {
-        String stations_string = (String) result;
-        String[] splitted = stations_string.split("\n");
-        Toast.makeText(this, Character.toString(splitted[1].charAt(0)), Toast.LENGTH_SHORT).show();
+    public ArrayList<String> station_parser(String input) {
+        ArrayList<String> station_names = new ArrayList<>();
+        String[] splitted = input.split("\n");
+
         for (int i = 1; i < splitted.length; i++) {
             String current = splitted[i];
             if (current.charAt(0) == "0".charAt(0)) {
@@ -139,13 +135,25 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 station_names.add(separated[1]);
             }
         }
+        return station_names;
+    }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_dropdown_item_1line, station_names);
-        entryView.setAdapter(adapter);
-        exitView.setAdapter(adapter);
+    @Override
+    public void updateFromDownload(Object res) {
+        HashMap<String, Object> result = (HashMap<String, Object>) res;
+        HashMap<String, String> request = (HashMap<String, String>) result.get("request");
 
-        Toast.makeText(this, "Download postaj usepešen :)", Toast.LENGTH_SHORT).show();
+        if (request.get("url").equals(API_postaje)) {
+            String stations_string = (String) result.get("response");
+            ArrayList<String> station_names = station_parser(stations_string);
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                    android.R.layout.simple_dropdown_item_1line, station_names);
+            entryView.setAdapter(adapter);
+            exitView.setAdapter(adapter);
+
+            Toast.makeText(this, "Download postaj usepešen :)", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
