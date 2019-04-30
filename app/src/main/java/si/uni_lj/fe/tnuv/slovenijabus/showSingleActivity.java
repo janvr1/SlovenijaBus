@@ -5,12 +5,16 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.ObjectStreamException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class showSingleActivity extends AppCompatActivity implements DownloadCallback {
@@ -45,13 +49,38 @@ public class showSingleActivity extends AppCompatActivity implements DownloadCal
         }
     }
 
-    public ArrayList<String> lineDataParser(String input) {
-        String[] splitted = input.split("0\\|\\|\\|");
-        ArrayList<String> output = new ArrayList<>();
-        for (String s : splitted) {
-            s = s.replace("|", " ");
-            output.add(s.trim());
+    public HashMap<String, Object> lineDataParser(String input) {
+        String[] splitted = input.split("\n");
+        HashMap<String, Object> output = new HashMap<>();
+        String start = splitted[0].split("\\|")[1];
+        output.put("start", start);
+        String destination = splitted[splitted.length - 2].split("\\|")[1];
+        output.put("end", destination);
+        String company = splitted[0].split("\\|")[0];
+        output.put("company", company);
+        ArrayList<String[]> visitedStations = new ArrayList<>();
+
+        for (int i = 1; i < splitted.length - 1; i++) {
+            if (i == 1) {
+                String s[] = splitted[i].split("\\|");
+                s = Arrays.copyOfRange(s, 1, s.length);
+                s[1] = s[1].substring(11, 16);
+                String[] ss = {s[1], s[0], ""};
+                if (s.length > 3) {
+                    ss[2] = s[3];
+                }
+                visitedStations.add(ss);
+                continue;
+            }
+            String[] s = splitted[i].split("\\|");
+            s[2] = s[2].substring(11, 16);
+            String[] ss = {s[2], s[1], ""};
+            if (s.length > 4) {
+                ss[2] = s[4];
+            }
+            visitedStations.add(ss);
         }
+        output.put("visited_stations", visitedStations);
         return output;
     }
 
@@ -68,10 +97,21 @@ public class showSingleActivity extends AppCompatActivity implements DownloadCal
 
         if (request.get("url").equals(API_podatki_relacija)) {
             String line_data_str = (String) result.get("response");
-            ArrayList<String> line_data = lineDataParser(line_data_str);
+            HashMap<String, Object> line_data = lineDataParser(line_data_str);
+            ArrayList<String> line_data_array = new ArrayList<>();
+            line_data_array.add("Prevoznik: " + line_data.get("company"));
+            line_data_array.add("Relacija: " + line_data.get("start") + " - " + line_data.get("end"));
+            line_data_array.add("Postaje:");
+            for (String[] s : (ArrayList<String[]>) line_data.get("visited_stations")) {
+                String station = s[0] + " " + s[1];
+                if (s[2] != "") {
+                    station += " " + s[2];
+                }
+                line_data_array.add(station);
+            }
             ListView lv = findViewById(R.id.show_single_list);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
-                    line_data);
+                    line_data_array);
             lv.setAdapter(adapter);
         }
 
