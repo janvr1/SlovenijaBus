@@ -5,14 +5,11 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,7 +51,7 @@ public class showSingleActivity extends AppCompatActivity implements DownloadCal
         HashMap<String, Object> output = new HashMap<>();
         String start = splitted[0].split("\\|")[1];
         output.put("start", start);
-        String destination = splitted[splitted.length - 2].split("\\|")[1];
+        String destination = splitted[splitted.length - 1].split("\\|")[1];
         output.put("end", destination);
         String company = splitted[0].split("\\|")[0];
         output.put("company", company);
@@ -62,7 +59,7 @@ public class showSingleActivity extends AppCompatActivity implements DownloadCal
 
         for (int i = 1; i < splitted.length - 1; i++) {
             if (i == 1) {
-                String s[] = splitted[i].split("\\|");
+                String[] s = splitted[i].split("\\|");
                 s = Arrays.copyOfRange(s, 1, s.length);
                 s[1] = s[1].substring(11, 16);
                 String[] ss = {s[1], s[0], ""};

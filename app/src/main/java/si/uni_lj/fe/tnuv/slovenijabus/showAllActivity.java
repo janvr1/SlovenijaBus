@@ -7,22 +7,28 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
+import android.widget.ExpandableListView;
+import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class showAllActivity extends AppCompatActivity implements DownloadCallback {
 
     public static final String API_voznired =
             "https://www.ap-ljubljana.si/_vozni_red/get_vozni_red_0.php"; // POST request
 
+    public static final String API_podatki_relacija =
+            "https://www.ap-ljubljana.si/_vozni_red/get_linija_info_0.php"; // POST request
+
     public static final String EXTRA_LINE_DATA = "intentData.LINE_DATA";
+
+    List<List<HashMap<String, String>>> listOfChildGroups;
+    SimpleExpandableListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,17 +102,73 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
 
         if (request.get("url").equals(API_voznired)) {
             String voznired_response = (String) result.get("response");
-            ArrayList<HashMap<String, String>> timetable = timetableParser(voznired_response);
+            final ArrayList<HashMap<String, String>> timetable = timetableParser(voznired_response);
 
-            String[] fromArray = {"entry_time", "exit_time", "duration", "line_data"};
-            int[] toArray = {R.id.entry_time, R.id.exit_time, R.id.duration, R.id.line_data};
-            ListView lv = findViewById(R.id.show_all_list);
+            listOfChildGroups = new ArrayList<List<HashMap<String, String>>>();
+            for (int i = 0; i < timetable.size(); i++) {
+                listOfChildGroups.add(i, new ArrayList<HashMap<String, String>>());
+            }
 
-            ListAdapter adapter = new SimpleAdapter(this, timetable, R.layout.show_all_list_item,
-                    fromArray, toArray);
+            ExpandableListView lv = findViewById(R.id.show_all_list);
+
+            String[] parentFromArray = {"entry_time", "exit_time", "duration"};
+            int[] parentToArray = {R.id.entry_time, R.id.exit_time, R.id.duration};
+
+//            String[] childFromArray = {"relacija", "prevoznik", "postaja"};
+//            int[] childToArray = {R.id.dropdown_relacija, R.id.dropdown_prevoznik, R.id.dropdown_postaja};
+            String[] childFromArray = {"dropdown_data"};
+            int[] childToArray = {R.id.dropdown_item};
+
+
+            adapter = new SimpleExpandableListAdapter(this,
+                    timetable, R.layout.show_all_list_item, parentFromArray, parentToArray,
+                    listOfChildGroups, R.layout.dropdown_list_item, childFromArray, childToArray
+            );
             lv.setAdapter(adapter);
+            lv.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+                @Override
+                public void onGroupExpand(int groupPosition) {
+                    HashMap<String, String> group = (HashMap<String, String>) adapter.getGroup(groupPosition);
+                    String req_data = group.get("line_data");
+                    getLineDataFromAPI(req_data, groupPosition);
+                    //Toast.makeText(showAllActivity.this, req_data, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
-            
+        if (request.get("url").equals(API_podatki_relacija)) {
+            String line_data_str = (String) result.get("response");
+            HashMap<String, Object> line_data = lineDataParser(line_data_str);
+
+            List group = listOfChildGroups.get(Integer.parseInt(request.get("group")));
+
+            String prevoznik = (String) getString(R.string.prevoznik) + " " + line_data.get("company");
+            String relacija = (String) getString(R.string.relacija) + " " + line_data.get("start") + " - " + line_data.get("end");
+/*
+            HashMap<String, String> prevoznikrelacija = new HashMap<>();
+
+            prevoznikrelacija.put("prevoznik", prevoznik);
+            prevoznikrelacija.put("relacija", relacija);
+            group.add(prevoznikrelacija);
+*/
+            HashMap<String, String> prevoznikmap = new HashMap<>();
+            prevoznikmap.put("dropdown_data", prevoznik);
+            HashMap<String, String> relacijamap = new HashMap<>();
+            relacijamap.put("dropdown_data", relacija);
+            group.add(prevoznikmap);
+            group.add(relacijamap);
+
+            for (String[] s : (ArrayList<String[]>) line_data.get("visited_stations")) {
+                String station = s[0] + " " + s[1];
+                if (s[2] != "") {
+                    station += " " + s[2];
+                }
+                HashMap<String, String> postaja = new HashMap<>();
+                postaja.put("dropdown_data", station);
+                group.add(postaja);
+            }
+
+            adapter.notifyDataSetChanged();
         }
     }
 
@@ -127,11 +189,58 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
     }
 
     public void launchShowSingle(View view) {
-        LinearLayout listItem = (LinearLayout) view;
+/*        LinearLayout listItem = (LinearLayout) view;
         TextView line_data = (TextView) listItem.getChildAt(0);
         String line_data_str = line_data.getText().toString();
         Intent intent = new Intent(this, showSingleActivity.class);
         intent.putExtra(EXTRA_LINE_DATA, line_data_str);
-        startActivity(intent);
+        startActivity(intent);*/
+
     }
+
+    public HashMap<String, Object> lineDataParser(String input) {
+        String[] splitted = input.split("\n");
+        HashMap<String, Object> output = new HashMap<>();
+        String start = splitted[0].split("\\|")[1];
+        output.put("start", start);
+        String destination = splitted[splitted.length - 1].split("\\|")[1];
+        output.put("end", destination);
+        String company = splitted[0].split("\\|")[0];
+        output.put("company", company);
+        ArrayList<String[]> visitedStations = new ArrayList<>();
+
+        for (int i = 1; i < splitted.length - 1; i++) {
+            if (i == 1) {
+                String[] s = splitted[i].split("\\|");
+                s = Arrays.copyOfRange(s, 1, s.length);
+                s[1] = s[1].substring(11, 16);
+                String[] ss = {s[1], s[0], ""};
+                if (s.length > 3) {
+                    ss[2] = s[3];
+                }
+                visitedStations.add(ss);
+                continue;
+            }
+            String[] s = splitted[i].split("\\|");
+            s[2] = s[2].substring(11, 16);
+            String[] ss = {s[2], s[1], ""};
+            if (s.length > 4) {
+                ss[2] = s[4];
+            }
+            visitedStations.add(ss);
+        }
+        output.put("visited_stations", visitedStations);
+        return output;
+    }
+
+    public void getLineDataFromAPI(String data, int i) {
+        HashMap<String, String> request = new HashMap<>();
+        request.put("url", API_podatki_relacija);
+        request.put("method", "POST");
+        request.put("data", "flags=" + data);
+        request.put("group", Integer.toString(i));
+        makeHttpRequest(request);
+    }
+
+
 }

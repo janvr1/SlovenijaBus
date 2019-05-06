@@ -3,17 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_margin="8dp">
+    android:animateLayoutChanges="true">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/show_all_title"
         android:textSize="18sp"
-        android:textStyle="bold" />
-    <ListView
+        android:textStyle="bold"
+        android:padding="8dp" />
+
+    <ExpandableListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/show_all_list" />
+        android:id="@+id/show_all_list"
+        android:animateLayoutChanges="true" />
 
 </LinearLayout>

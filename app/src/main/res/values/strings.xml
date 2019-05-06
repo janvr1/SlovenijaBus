@@ -10,4 +10,6 @@
     <string name="departure">Odhod</string>
     <string name="duration">Trajanje</string>
     <string name="semicolon">:</string>
+    <string name="prevoznik">Prevoznik: </string>
+    <string name="relacija">Relacija: </string>
 </resources>
