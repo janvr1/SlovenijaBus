@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
-        month = calendar.get(Calendar.MONTH) + 1; // Android šteje mesece od 0, zato +1
+        month = calendar.get(Calendar.MONTH); // hint: Android šteje mesece od 0
         day = calendar.get(Calendar.DAY_OF_MONTH);
         end_day = calendar.get(Calendar.DAY_OF_MONTH) + 14; // Datum za do dva tedna v naprej <—— To ne bo dobr delal, če je do konca meseca manj kot dva tedna ;)
 
@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     };
 
     private String dateStringBuilder(int year, int month, int day) {
+        month++;
         return day + "." + month + "." + year;
     }
 

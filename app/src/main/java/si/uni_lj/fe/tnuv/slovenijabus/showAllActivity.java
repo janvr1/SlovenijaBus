@@ -101,9 +101,12 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
             String[] fromArray = {"entry_time", "exit_time", "duration", "line_data"};
             int[] toArray = {R.id.entry_time, R.id.exit_time, R.id.duration, R.id.line_data};
             ListView lv = findViewById(R.id.show_all_list);
+
             ListAdapter adapter = new SimpleAdapter(this, timetable, R.layout.show_all_list_item,
                     fromArray, toArray);
             lv.setAdapter(adapter);
+
+            
         }
     }
 
