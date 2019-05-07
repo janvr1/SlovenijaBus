@@ -105,20 +105,20 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
     public void updateFromDownload(Object res) {
         HashMap<String, Object> result = (HashMap<String, Object>) res;
         HashMap<String, String> request = (HashMap<String, String>) result.get("request");
+        String result_string = (String) result.get("response");
 
-        if (((String) result.get("response")).length() < 2) {
+        if (result_string.length() < 2) {
             Toast.makeText(this, getString(R.string.no_buses_message), Toast.LENGTH_LONG).show();
             return;
         }
 
-        if (result.get("response").equals("error")) {
+        if (result_string.equals("error")) {
             Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_LONG).show();
             return;
         }
 
         if (request.get("url").equals(API_voznired)) {
-            String voznired_response = (String) result.get("response");
-            final ArrayList<HashMap<String, String>> timetable = timetableParser(voznired_response);
+            final ArrayList<HashMap<String, String>> timetable = timetableParser(result_string);
 
             listOfChildGroups = new ArrayList<List<HashMap<String, String>>>();
             for (int i = 0; i < timetable.size(); i++) {
@@ -156,8 +156,7 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
         }
 
         if (request.get("url").equals(API_podatki_relacija)) {
-            String line_data_str = (String) result.get("response");
-            HashMap<String, Object> line_data = lineDataParser(line_data_str);
+            HashMap<String, Object> line_data = lineDataParser(result_string);
 
             int groupPosition = Integer.parseInt(request.get("group"));
             List childGroup = listOfChildGroups.get(groupPosition);
