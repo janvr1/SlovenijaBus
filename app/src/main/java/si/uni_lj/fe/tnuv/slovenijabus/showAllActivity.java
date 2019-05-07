@@ -106,8 +106,8 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
         HashMap<String, Object> result = (HashMap<String, Object>) res;
         HashMap<String, String> request = (HashMap<String, String>) result.get("request");
 
-        if (result.get("reponse") == null) {
-            Toast.makeText(this, getString(R.string.invalid_station), Toast.LENGTH_LONG).show();
+        if (((String) result.get("response")).length() < 2) {
+            Toast.makeText(this, getString(R.string.no_buses_message), Toast.LENGTH_LONG).show();
             return;
         }
 

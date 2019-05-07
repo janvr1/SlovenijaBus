@@ -21,4 +21,7 @@
     <string name="favorite">Favorite</string>
     <string name="change_direction">Zamenjaj smer</string>
     <string name="invalid_station">Neveljavno ime postaje</string>
+    <string name="entry">Vstop</string>
+    <string name="exit">Izstop</string>
+    <string name="no_buses_message">Med izbranimi postajami ni avtobusov</string>
 </resources>
