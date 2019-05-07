@@ -2,21 +2,51 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:animateLayoutChanges="true">
+    android:animateLayoutChanges="true"
+    android:orientation="vertical">
 
     <TextView
+        android:id="@+id/show_all_vstop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/show_all_title"
+        android:paddingLeft="16dp"
+        android:paddingTop="8dp"
+        android:paddingRight="16dp"
         android:textSize="18sp"
-        android:textStyle="bold"
-        android:padding="8dp" />
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/show_all_izstop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/show_all_datum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="8dp"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:onClick="addToFavorites"
+        android:text="Favorite" />
 
     <ExpandableListView
+        android:id="@+id/show_all_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/show_all_list"
-        android:animateLayoutChanges="true" />
+        android:animateLayoutChanges="true"
+        android:childDivider="#00000000" />
 
 </LinearLayout>

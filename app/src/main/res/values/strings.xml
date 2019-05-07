@@ -10,6 +10,12 @@
     <string name="departure">Odhod</string>
     <string name="duration">Trajanje</string>
     <string name="semicolon">:</string>
-    <string name="prevoznik">Prevoznik: </string>
-    <string name="relacija">Relacija: </string>
+    <string name="prevoznik">Prevoznik</string>
+    <string name="relacija">Relacija</string>
+    <string name="showall_entry_station">Vstop: %1$s</string>
+    <string name="showall_exit_station">Izstop: %1$s</string>
+    <string name="showall_date">Datum: %1$s</string>
+    <string name="favorites">Priljubljene</string>
+    <string name="date">Datum</string>
+    <string name="preferences_key"> si.uni_lj.fe.tnuv.slovenijabus</string>
 </resources>

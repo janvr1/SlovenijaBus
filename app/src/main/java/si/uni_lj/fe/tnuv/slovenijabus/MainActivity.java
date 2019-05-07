@@ -4,21 +4,26 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements DownloadCallback {
 
@@ -37,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
     public static Map<String, String> stations_map = new HashMap<>();
 
+    ArrayAdapter<String> favorites_adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,10 +61,37 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         entryView = findViewById(R.id.vstopna_vnos);
         exitView = findViewById(R.id.izstopna_vnos);
 
-        entryView.setText("Vir pri Domžalah in Vir Cerkev");  //Samo za testne namene
-        exitView.setText("LJUBLJANA AVTOBUSNA POSTAJA");
+/*        entryView.setText("Vir pri Domžalah in Vir Cerkev");  //Samo za testne namene
+        exitView.setText("LJUBLJANA AVTOBUSNA POSTAJA");*/
 
         getStationsFromAPI();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        Set<String> favorites = readFavorites();
+        ListView fav_lv = findViewById(R.id.favorites_listview);
+        final ArrayList<String> favorites_array = new ArrayList<>(favorites);
+
+        favorites_adapter = new ArrayAdapter<String>(this,
+                R.layout.favorites_list_item, R.id.favorites_text, favorites_array);
+
+        fav_lv.setAdapter(favorites_adapter);
+        fav_lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                           int position, long id) {
+                favorites_array.remove(position);
+                Set<String> new_fav = new HashSet<>(favorites_array);
+                favorites_adapter.notifyDataSetChanged();
+                writeFavorites(new_fav);
+                Toast.makeText(MainActivity.this, "Item Deleted", Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
     }
 
     public void setDate(View view) {
@@ -82,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     };
 
     private String dateStringBuilder(int year, int month, int day) {
-        month++;
+        month++; // da je pravilen mesec :)
         return day + "." + month + "." + year;
     }
 
@@ -95,6 +129,16 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         intent.putExtra(EXTRA_ENTRY, stations_map.get(entryStation));
         intent.putExtra(EXTRA_EXIT, stations_map.get(exitStation));
         intent.putExtra(EXTRA_DATE, date);
+        startActivity(intent);
+    }
+
+    public void launchShowAllFromFavorites(View view) {
+        TextView text = (TextView) view;
+        String[] stations = text.getText().toString().split(";");
+        Intent intent = new Intent(this, showAllActivity.class);
+        intent.putExtra(EXTRA_ENTRY, stations[0]);
+        intent.putExtra(EXTRA_EXIT, stations[1]);
+        intent.putExtra(EXTRA_DATE, dateStringBuilder(year, month, day));
         startActivity(intent);
     }
 
@@ -138,6 +182,31 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         }
         return station_names;
     }
+
+    public Set<String> readFavorites() {
+        SharedPreferences sharedPref = getSharedPreferences(
+                getString(R.string.preferences_key), Context.MODE_PRIVATE);
+        return sharedPref.getStringSet("favorites", new HashSet<String>());
+    }
+
+    public void writeFavorites(Set<String> fav) {
+        SharedPreferences sharedPref = getSharedPreferences(
+                getString(R.string.preferences_key), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putStringSet("favorites", fav);
+        editor.commit();
+    }
+
+/*    public void removeFavorite(View view) {
+        TextView favoritesText;
+        String toRemove = favoritesText.getText().toString();
+        Set<String> fav = readFavorites();
+        Set<String> new_fav = new HashSet<>(fav);
+        new_fav.remove(toRemove);
+        writeFavorites(new_fav);
+    }*/
+
 
     @Override
     public void updateFromDownload(Object res) {
