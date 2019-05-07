@@ -34,13 +34,32 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
-        android:onClick="addToFavorites"
-        android:text="Favorite" />
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_weight="1"
+            android:onClick="addToFavorites"
+            android:text="@string/favorite" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_weight="1"
+            android:onClick="changeDirection"
+            android:text="@string/change_direction" />
+
+    </LinearLayout>
 
     <ExpandableListView
         android:id="@+id/show_all_list"

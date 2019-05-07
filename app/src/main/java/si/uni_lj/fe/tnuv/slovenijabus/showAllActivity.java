@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
@@ -16,7 +17,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -313,36 +314,64 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
     }
 
     public void addToFavorites(View view) {
-        Set<String> favorites = readFavorites();
-        Set<String> newFavorites = new HashSet<>();
-        newFavorites.addAll(favorites);
+        ArrayList<HashMap<String, String>> favorites = readFavorites();
 
         Intent intent = getIntent();
         String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
         String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
-        String toWrite = entryStationID + ";" + exitStationID;
 
-        newFavorites.add(toWrite);
-        writeFavorites(newFavorites);
+        HashMap<String, String> newMap = new HashMap<>();
+        newMap.put("from", MainActivity.stations_map.get(entryStationID));
+        newMap.put("to", MainActivity.stations_map.get(exitStationID));
 
-        Toast.makeText(this, toWrite, Toast.LENGTH_SHORT).show();
+        favorites.add(newMap);
+        writeFavorites(favorites);
 
-
+        Toast.makeText(this, "worky worky", Toast.LENGTH_SHORT).show();
     }
 
 
-    public Set<String> readFavorites() {
+    public ArrayList<HashMap<String, String>> readFavorites() {
         SharedPreferences sharedPref = getSharedPreferences(
                 getString(R.string.preferences_key), Context.MODE_PRIVATE);
-        return sharedPref.getStringSet("favorites", new HashSet<String>());
+
+        Set<String> fav = sharedPref.getStringSet("favorites", new LinkedHashSet<String>());
+        ArrayList<HashMap<String, String>> fav_array = new ArrayList<>();
+        for (String s : fav) {
+            String[] ss = s.split(";");
+            HashMap<String, String> map = new HashMap<>();
+            map.put("from", ss[0]);
+            map.put("to", ss[1]);
+            fav_array.add(map);
+        }
+        return fav_array;
+
     }
 
-    public void writeFavorites(Set<String> fav) {
+    public void writeFavorites(ArrayList<HashMap<String, String>> fav) {
         SharedPreferences sharedPref = getSharedPreferences(
                 getString(R.string.preferences_key), Context.MODE_PRIVATE);
 
+        ArrayList<String> fav2 = new ArrayList<>();
+        for (HashMap<String, String> map : fav) {
+            fav2.add(TextUtils.join(";", new String[]{map.get("from"), map.get("to")}));
+        }
+        Set<String> favorites = new LinkedHashSet<>(fav2);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putStringSet("favorites", fav);
-        editor.commit();
+        editor.putStringSet("favorites", favorites);
+        editor.apply();
+    }
+
+    public void changeDirection(View view) {
+        Intent intent = getIntent();
+        String date = intent.getStringExtra(MainActivity.EXTRA_DATE);
+        String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
+        String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
+
+        Intent newIntent = new Intent(this, showAllActivity.class);
+        newIntent.putExtra(MainActivity.EXTRA_ENTRY, exitStationID);
+        newIntent.putExtra(MainActivity.EXTRA_EXIT, entryStationID);
+        newIntent.putExtra(MainActivity.EXTRA_DATE, date);
+        startActivity(newIntent);
     }
 }

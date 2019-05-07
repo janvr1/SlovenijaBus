@@ -9,19 +9,21 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,7 +44,8 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
     public static Map<String, String> stations_map = new HashMap<>();
 
-    ArrayAdapter<String> favorites_adapter;
+    SimpleAdapter favorites_adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +64,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         entryView = findViewById(R.id.vstopna_vnos);
         exitView = findViewById(R.id.izstopna_vnos);
 
-/*        entryView.setText("Vir pri Domžalah in Vir Cerkev");  //Samo za testne namene
-        exitView.setText("LJUBLJANA AVTOBUSNA POSTAJA");*/
-
         getStationsFromAPI();
     }
 
@@ -71,25 +71,44 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     protected void onStart() {
         super.onStart();
 
-        Set<String> favorites = readFavorites();
+        final ArrayList<HashMap<String, String>> favorites = readFavorites();
         ListView fav_lv = findViewById(R.id.favorites_listview);
-        final ArrayList<String> favorites_array = new ArrayList<>(favorites);
 
-        favorites_adapter = new ArrayAdapter<String>(this,
-                R.layout.favorites_list_item, R.id.favorites_text, favorites_array);
+        String[] fromArray = {"from", "to"};
+        int[] toArray = {R.id.favorites_from, R.id.favorites_to};
 
+
+        favorites_adapter = new SimpleAdapter(this, favorites, R.layout.favorites_list_item,
+                fromArray, toArray);
         fav_lv.setAdapter(favorites_adapter);
+
         fav_lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                                            int position, long id) {
-                favorites_array.remove(position);
-                Set<String> new_fav = new HashSet<>(favorites_array);
+                favorites.remove(position);
                 favorites_adapter.notifyDataSetChanged();
-                writeFavorites(new_fav);
+                writeFavorites(favorites);
                 Toast.makeText(MainActivity.this, "Item Deleted", Toast.LENGTH_LONG).show();
                 return true;
+            }
+        });
+
+        fav_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                HashMap<String, String> clicked = favorites.get(position);
+                String entryID = stations_map.get(clicked.get("from"));
+                String exitID = stations_map.get(clicked.get("to"));
+
+                Intent intent = new Intent(getApplicationContext(), showAllActivity.class);
+
+                intent.putExtra(EXTRA_ENTRY, entryID);
+                intent.putExtra(EXTRA_EXIT, exitID);
+                intent.putExtra(EXTRA_DATE, dateStringBuilder(year, month, day));
+                startActivity(intent);
+
             }
         });
     }
@@ -132,15 +151,15 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         startActivity(intent);
     }
 
-    public void launchShowAllFromFavorites(View view) {
+/*    public void launchShowAllFromFavorites(View view) {
         TextView text = (TextView) view;
         String[] stations = text.getText().toString().split(";");
         Intent intent = new Intent(this, showAllActivity.class);
-        intent.putExtra(EXTRA_ENTRY, stations[0]);
-        intent.putExtra(EXTRA_EXIT, stations[1]);
+        intent.putExtra(EXTRA_ENTRY, stations_map.get(stations[0]));
+        intent.putExtra(EXTRA_EXIT, stations_map.get(stations[1]));
         intent.putExtra(EXTRA_DATE, dateStringBuilder(year, month, day));
         startActivity(intent);
-    }
+    }*/
 
 
     public void makeHttpRequest(HashMap<String, String> request) {
@@ -183,29 +202,36 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         return station_names;
     }
 
-    public Set<String> readFavorites() {
+    public ArrayList<HashMap<String, String>> readFavorites() {
         SharedPreferences sharedPref = getSharedPreferences(
                 getString(R.string.preferences_key), Context.MODE_PRIVATE);
-        return sharedPref.getStringSet("favorites", new HashSet<String>());
+
+        Set<String> fav = sharedPref.getStringSet("favorites", new LinkedHashSet<String>());
+        ArrayList<HashMap<String, String>> fav_array = new ArrayList<>();
+        for (String s : fav) {
+            String[] ss = s.split(";");
+            HashMap<String, String> map = new HashMap<>();
+            map.put("from", ss[0]);
+            map.put("to", ss[1]);
+            fav_array.add(map);
+        }
+        return fav_array;
+
     }
 
-    public void writeFavorites(Set<String> fav) {
+    public void writeFavorites(ArrayList<HashMap<String, String>> fav) {
         SharedPreferences sharedPref = getSharedPreferences(
                 getString(R.string.preferences_key), Context.MODE_PRIVATE);
 
+        ArrayList<String> fav2 = new ArrayList<>();
+        for (HashMap<String, String> map : fav) {
+            fav2.add(TextUtils.join(";", new String[]{map.get("from"), map.get("to")}));
+        }
+        Set<String> favorites = new LinkedHashSet<>(fav2);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putStringSet("favorites", fav);
-        editor.commit();
+        editor.putStringSet("favorites", favorites);
+        editor.apply();
     }
-
-/*    public void removeFavorite(View view) {
-        TextView favoritesText;
-        String toRemove = favoritesText.getText().toString();
-        Set<String> fav = readFavorites();
-        Set<String> new_fav = new HashSet<>(fav);
-        new_fav.remove(toRemove);
-        writeFavorites(new_fav);
-    }*/
 
 
     @Override

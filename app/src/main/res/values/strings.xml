@@ -18,4 +18,6 @@
     <string name="favorites">Priljubljene</string>
     <string name="date">Datum</string>
     <string name="preferences_key"> si.uni_lj.fe.tnuv.slovenijabus</string>
+    <string name="favorite">Favorite</string>
+    <string name="change_direction">Zamenjaj smer</string>
 </resources>

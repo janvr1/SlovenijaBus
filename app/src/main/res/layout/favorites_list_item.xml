@@ -2,22 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:paddingHorizontal="32dp">
 
     <TextView
-        android:layout_width="0dp"
-        android:layout_weight="10"
-        android:layout_height="wrap_content"
-        android:id="@+id/favorites_text"
-        android:onClick="launchShowAllFromFavorites"
-        android:longClickable="true" />
+        android:id="@+id/favorites_from"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-    <Button
-        android:layout_width="wrap_content"
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="removeFavorite"
-        android:text="Izbrisi" />
+        android:id="@+id/favorites_to" />
 
 
 </LinearLayout>
