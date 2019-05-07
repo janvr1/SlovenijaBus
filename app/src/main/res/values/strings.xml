@@ -20,4 +20,5 @@
     <string name="preferences_key"> si.uni_lj.fe.tnuv.slovenijabus</string>
     <string name="favorite">Favorite</string>
     <string name="change_direction">Zamenjaj smer</string>
+    <string name="invalid_station">Neveljavno ime postaje</string>
 </resources>

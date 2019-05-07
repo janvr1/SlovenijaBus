@@ -106,6 +106,11 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
         HashMap<String, Object> result = (HashMap<String, Object>) res;
         HashMap<String, String> request = (HashMap<String, String>) result.get("request");
 
+        if (result.get("reponse") == null) {
+            Toast.makeText(this, getString(R.string.invalid_station), Toast.LENGTH_LONG).show();
+            return;
+        }
+
         if (result.get("response").equals("error")) {
             Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_LONG).show();
             return;
@@ -179,34 +184,6 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
                 childGroup.add(postaja);
             }
 
-
-/*            String prevoznik = (String) getString(R.string.prevoznik) + " " + line_data.get("company");
-            String relacija = (String) getString(R.string.relacija) + " "
-                    + line_data.get("start") + " - " + line_data.get("end");*/
-/*
-            HashMap<String, String> prevoznikrelacija = new HashMap<>();
-
-            prevoznikrelacija.put("prevoznik", prevoznik);
-            prevoznikrelacija.put("relacija", relacija);
-            group.add(prevoznikrelacija);
-*/
-/*            HashMap<String, String> prevoznikmap = new HashMap<>();
-            prevoznikmap.put("dropdown_data", prevoznik);
-            HashMap<String, String> relacijamap = new HashMap<>();
-            relacijamap.put("dropdown_data", relacija);
-            group.add(prevoznikmap);
-            group.add(relacijamap);
-
-            for (String[] s : (ArrayList<String[]>) line_data.get("visited_stations")) {
-                String station = s[0] + " " + s[1];
-                if (s[2] != "") {
-                    station += " " + s[2];
-                }
-                HashMap<String, String> postaja = new HashMap<>();
-                postaja.put("dropdown_data", station);
-                group.add(postaja);
-            }*/
-
             adapter.notifyDataSetChanged();
         }
     }
@@ -227,15 +204,15 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
     public void finishDownloading() {
     }
 
-    public void launchShowSingle(View view) {
-/*        LinearLayout listItem = (LinearLayout) view;
+/*    public void launchShowSingle(View view) {
+        LinearLayout listItem = (LinearLayout) view;
         TextView line_data = (TextView) listItem.getChildAt(0);
         String line_data_str = line_data.getText().toString();
         Intent intent = new Intent(this, showSingleActivity.class);
         intent.putExtra(EXTRA_LINE_DATA, line_data_str);
-        startActivity(intent);*/
+        startActivity(intent);
 
-    }
+    }*/
 
     public HashMap<String, Object> lineDataParser(String input) {
         String[] splitted = input.split("\n");
@@ -255,27 +232,6 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
 
         ArrayList<HashMap<String, String>> visitedStations = new ArrayList<>();
 
-/*        for (int i = 1; i < splitted.length - 1; i++) {
-            if (i == 1) {
-                String[] s = splitted[i].split("\\|");
-                s = Arrays.copyOfRange(s, 1, s.length);
-                s[1] = s[1].substring(11, 16);
-                String[] ss = {s[1], s[0], ""};
-                if (s.length > 3) {
-                    ss[2] = s[3];
-                }
-                visitedStations.add(ss);
-                continue;
-            }
-            String[] s = splitted[i].split("\\|");
-            s[2] = s[2].substring(11, 16);
-            String[] ss = {s[2], s[1], ""};
-            if (s.length > 4) {
-                ss[2] = s[4];
-            }
-            visitedStations.add(ss);
-        }
-        output.put("visited_stations", visitedStations);*/
         for (int i = 1; i < splitted.length - 1; i++) {
             if (i == 1) {
                 String[] s = splitted[i].split("\\|");
