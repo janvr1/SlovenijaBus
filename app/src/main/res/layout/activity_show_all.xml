@@ -5,25 +5,54 @@
     android:animateLayoutChanges="true"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/show_all_vstop"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
+        android:orientation="horizontal"
         android:paddingTop="8dp"
         android:paddingRight="16dp"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:paddingLeft="16dp">
 
-    <TextView
-        android:id="@+id/show_all_izstop"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/showall_entry_station"
+            android:textSize="18sp"
+            android:paddingRight="8dp" />
+
+        <TextView
+            android:id="@+id/show_all_vstop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="normal"
+            android:textColor="#323232" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
         android:paddingRight="16dp"
-        android:paddingBottom="8dp"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:paddingLeft="16dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/showall_exit_station"
+            android:textSize="18sp"
+            android:paddingRight="8dp" />
+
+        <TextView
+            android:id="@+id/show_all_izstop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="normal"
+            android:textColor="#323232" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

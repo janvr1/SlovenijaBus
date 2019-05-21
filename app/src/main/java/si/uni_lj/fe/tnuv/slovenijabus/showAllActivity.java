@@ -59,9 +59,9 @@ public class showAllActivity extends AppCompatActivity {
         String exitName = MainActivity.stations_map.get(exitStationID);
 
         TextView vstop = findViewById(R.id.show_all_vstop);
-        vstop.setText(getString(R.string.showall_entry_station, entryName));
+        vstop.setText(entryName);
         TextView izstop = findViewById(R.id.show_all_izstop);
-        izstop.setText(getString(R.string.showall_exit_station, exitName));
+        izstop.setText(exitName);
 
         ViewPager viewPager = findViewById(R.id.viewPager);
         TabLayout tabLayout = findViewById(R.id.tabLayout);
