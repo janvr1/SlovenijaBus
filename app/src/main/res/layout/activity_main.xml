@@ -72,9 +72,10 @@
         android:layout_marginTop="12dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:background="#7CFFFFFF"
+        android:background="@android:color/transparent"
         android:onClick="setDate"
-        android:textSize="16sp"
+        android:textSize="22sp"
+        android:textStyle="normal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/izstopna_vnos" />
@@ -103,7 +104,7 @@
         app:layout_constraintTop_toBottomOf="@+id/najdi" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/datum_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -129,12 +130,14 @@
         android:layout_marginEnd="32dp"
         android:layout_marginRight="32dp"
         android:layout_marginBottom="24dp"
+        android:background="@android:color/transparent"
+        android:onClick="swapStations"
         android:scaleType="center"
+        android:scaleY="1.5"
+        android:src="@drawable/swap_arrows_vertical"
         app:layout_constraintBottom_toBottomOf="@+id/izstopna_vnos"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/vstopna_vnos"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/swap_arrows"
-        android:onClick="swapStations" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

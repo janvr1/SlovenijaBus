@@ -151,16 +151,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         startActivity(intent);
     }
 
-/*    public void launchShowAllFromFavorites(View view) {
-        TextView text = (TextView) view;
-        String[] stations = text.getText().toString().split(";");
-        Intent intent = new Intent(this, showAllActivity.class);
-        intent.putExtra(EXTRA_ENTRY, stations_map.get(stations[0]));
-        intent.putExtra(EXTRA_EXIT, stations_map.get(stations[1]));
-        intent.putExtra(EXTRA_DATE, dateStringBuilder(year, month, day));
-        startActivity(intent);
-    }*/
-
 
     public void makeHttpRequest(HashMap<String, String> request) {
         NetworkInfo netInfo = getActiveNetworkInfo();

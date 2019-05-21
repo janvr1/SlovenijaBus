@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     tools:context=".timetableFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <ExpandableListView
         android:id="@+id/show_all_list"
         android:layout_width="match_parent"
