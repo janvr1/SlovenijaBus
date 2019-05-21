@@ -61,11 +61,15 @@
 
     </LinearLayout>
 
-    <ExpandableListView
-        android:id="@+id/show_all_list"
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
-        android:childDivider="#00000000" />
+        android:minHeight="?actionBarSize" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

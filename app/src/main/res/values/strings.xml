@@ -24,4 +24,7 @@
     <string name="entry">Vstop</string>
     <string name="exit">Izstop</string>
     <string name="no_buses_message">Med izbranimi postajami ni avtobusov</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

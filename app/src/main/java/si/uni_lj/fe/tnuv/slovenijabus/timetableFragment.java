@@ -1,30 +1,36 @@
 package si.uni_lj.fe.tnuv.slovenijabus;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
-public class showAllActivity extends AppCompatActivity implements timetableFragment.OnFragmentInteractionListener {
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link timetableFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link timetableFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+
+public class timetableFragment extends Fragment implements DownloadCallback {
 
     public static final String API_voznired =
             "https://www.ap-ljubljana.si/_vozni_red/get_vozni_red_0.php"; // POST request
@@ -39,67 +45,87 @@ public class showAllActivity extends AppCompatActivity implements timetableFragm
 
     public ArrayList<Integer> alreadyDownloadedLines = new ArrayList<>();
 
+    ExpandableListView lv;
+
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_REQUEST_STRING = "req_str";
+
+    // TODO: Rename and change types of parameters
+    private String request_string;
+
+    private OnFragmentInteractionListener mListener;
+
+    public timetableFragment() {
+    }
+
+    public static timetableFragment newInstance(String param) {
+        timetableFragment fragment = new timetableFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_REQUEST_STRING, param);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_all);
-
-        Intent intent = getIntent();
-        String date = intent.getStringExtra(MainActivity.EXTRA_DATE);
-        String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
-        String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
-
-        String request_data = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date;
-        //getTimetablesFromAPI(request_data);
-        String date2 = null, date3 = null;
-
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-            Date date1 = sdf.parse(date);
-            Calendar c = Calendar.getInstance();
-            c.setTime(date1);
-            c.add(Calendar.DAY_OF_MONTH, 1);
-            date2 = sdf.format(c.getTime());
-            Log.d("datumi", date2);
-            c.add(Calendar.DAY_OF_MONTH, 1);
-            date3 = sdf.format(c.getTime());
-        } catch (Exception e) {
-            Log.d("parse exception", "something no worky worky");
+        if (getArguments() != null) {
+            request_string = getArguments().getString(ARG_REQUEST_STRING);
         }
-
-        String request_data2 = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date2;
-        String request_data3 = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date3;
-        Log.d("req_str", request_data2);
-        Log.d("req_str", request_data3);
-
-        String entryName = MainActivity.stations_map.get(entryStationID);
-        String exitName = MainActivity.stations_map.get(exitStationID);
-
-        TextView vstop = findViewById(R.id.show_all_vstop);
-        vstop.setText(getString(R.string.showall_entry_station, entryName));
-        TextView izstop = findViewById(R.id.show_all_izstop);
-        izstop.setText(getString(R.string.showall_exit_station, exitName));
-        TextView datum = findViewById(R.id.show_all_datum);
-        datum.setText(getString(R.string.showall_date, date));
-
-        Toast.makeText(this, "Request string: " + request_data, Toast.LENGTH_LONG).show();
-
-        ViewPager viewPager = findViewById(R.id.viewPager);
-        TabLayout tabLayout = findViewById(R.id.tabLayout);
-
-        FragmentTabAdapter adapter = new FragmentTabAdapter(getSupportFragmentManager());
-        adapter.addFragment(timetableFragment.newInstance(request_data), date);
-        adapter.addFragment(timetableFragment.newInstance(request_data2), date2);
-        adapter.addFragment(timetableFragment.newInstance(request_data3), date3);
-
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-
-
+        getTimetablesFromAPI(request_string);
     }
 
- /*   public void getTimetablesFromAPI(String data) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_timetable, container, false);
+        lv = view.findViewById(R.id.show_all_list);
+        return view;
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
+    public void getTimetablesFromAPI(String data) {
         HashMap<String, String> request = new HashMap<>();
         request.put("url", API_voznired);
         request.put("method", "POST");
@@ -113,7 +139,7 @@ public class showAllActivity extends AppCompatActivity implements timetableFragm
         if (netInfo != null && netInfo.isConnected()) {
             new DownloadAsyncTask(this).execute(request);
         } else {
-            Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -172,12 +198,12 @@ public class showAllActivity extends AppCompatActivity implements timetableFragm
         String result_string = (String) result.get("response");
 
         if (result_string.length() < 2) {
-            Toast.makeText(this, getString(R.string.no_buses_message), Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, getString(R.string.no_buses_message), Toast.LENGTH_LONG).show();
             return;
         }
 
         if (result_string.equals("error")) {
-            Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -189,8 +215,6 @@ public class showAllActivity extends AppCompatActivity implements timetableFragm
                 listOfChildGroups.add(i, new ArrayList<HashMap<String, String>>());
             }
 
-            ExpandableListView lv = findViewById(R.id.show_all_list);
-
             String[] parentFromArray = {"entry_time", "exit_time", "duration"};
             int[] parentToArray = {R.id.entry_time, R.id.exit_time, R.id.duration};
 
@@ -200,7 +224,7 @@ public class showAllActivity extends AppCompatActivity implements timetableFragm
             int[] childToArray = {R.id.dropdown_item_label, R.id.dropdown_item_data};
 
 
-            adapter = new SimpleExpandableListAdapter(this,
+            adapter = new SimpleExpandableListAdapter(getActivity().getApplicationContext(),
                     timetable, R.layout.show_all_list_item, parentFromArray, parentToArray,
                     listOfChildGroups, R.layout.dropdown_list_item, childFromArray, childToArray);
             lv.setAdapter(adapter);
@@ -254,7 +278,7 @@ public class showAllActivity extends AppCompatActivity implements timetableFragm
     @Override
     public NetworkInfo getActiveNetworkInfo() {
         ConnectivityManager connectivityManager =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         return networkInfo;
     }
@@ -267,7 +291,7 @@ public class showAllActivity extends AppCompatActivity implements timetableFragm
     public void finishDownloading() {
     }
 
-*//*    public void launchShowSingle(View view) {
+/*    public void launchShowSingle(View view) {
         LinearLayout listItem = (LinearLayout) view;
         TextView line_data = (TextView) listItem.getChildAt(0);
         String line_data_str = line_data.getText().toString();
@@ -275,7 +299,7 @@ public class showAllActivity extends AppCompatActivity implements timetableFragm
         intent.putExtra(EXTRA_LINE_DATA, line_data_str);
         startActivity(intent);
 
-    }*//*
+    }*/
 
     public HashMap<String, Object> lineDataParser(String input) {
         String[] splitted = input.split("\n");
@@ -330,72 +354,6 @@ public class showAllActivity extends AppCompatActivity implements timetableFragm
         request.put("data", "flags=" + data);
         request.put("group", Integer.toString(i));
         makeHttpRequest(request);
-    }*/
-
-    public void addToFavorites(View view) {
-        ArrayList<HashMap<String, String>> favorites = readFavorites();
-
-        Intent intent = getIntent();
-        String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
-        String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
-
-        HashMap<String, String> newMap = new HashMap<>();
-        newMap.put("from", MainActivity.stations_map.get(entryStationID));
-        newMap.put("to", MainActivity.stations_map.get(exitStationID));
-
-        favorites.add(newMap);
-        writeFavorites(favorites);
-
-        Toast.makeText(this, "worky worky", Toast.LENGTH_SHORT).show();
     }
 
-
-    public ArrayList<HashMap<String, String>> readFavorites() {
-        SharedPreferences sharedPref = getSharedPreferences(
-                getString(R.string.preferences_key), Context.MODE_PRIVATE);
-
-        Set<String> fav = sharedPref.getStringSet("favorites", new LinkedHashSet<String>());
-        ArrayList<HashMap<String, String>> fav_array = new ArrayList<>();
-        for (String s : fav) {
-            String[] ss = s.split(";");
-            HashMap<String, String> map = new HashMap<>();
-            map.put("from", ss[0]);
-            map.put("to", ss[1]);
-            fav_array.add(map);
-        }
-        return fav_array;
-
-    }
-
-    public void writeFavorites(ArrayList<HashMap<String, String>> fav) {
-        SharedPreferences sharedPref = getSharedPreferences(
-                getString(R.string.preferences_key), Context.MODE_PRIVATE);
-
-        ArrayList<String> fav2 = new ArrayList<>();
-        for (HashMap<String, String> map : fav) {
-            fav2.add(TextUtils.join(";", new String[]{map.get("from"), map.get("to")}));
-        }
-        Set<String> favorites = new LinkedHashSet<>(fav2);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putStringSet("favorites", favorites);
-        editor.apply();
-    }
-
-    public void changeDirection(View view) {
-        Intent intent = getIntent();
-        String date = intent.getStringExtra(MainActivity.EXTRA_DATE);
-        String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
-        String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
-
-        Intent newIntent = new Intent(this, showAllActivity.class);
-        newIntent.putExtra(MainActivity.EXTRA_ENTRY, exitStationID);
-        newIntent.putExtra(MainActivity.EXTRA_EXIT, entryStationID);
-        newIntent.putExtra(MainActivity.EXTRA_DATE, date);
-        startActivity(newIntent);
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
 }
