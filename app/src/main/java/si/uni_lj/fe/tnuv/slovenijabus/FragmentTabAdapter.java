@@ -3,17 +3,18 @@ package si.uni_lj.fe.tnuv.slovenijabus;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentTabAdapter extends FragmentStatePagerAdapter {
-    private final List<Fragment> mFragmentList = new ArrayList<>();
-    private final List<String> FragmentTitleList = new ArrayList<>();
+public class FragmentTabAdapter extends FragmentPagerAdapter {
+    private final List<Fragment> mFragmentList;
+    private final List<String> mFragmentTitleList;
 
-    FragmentTabAdapter(FragmentManager fm) {
+    FragmentTabAdapter(FragmentManager fm, List<Fragment> fragments, List<String> titles) {
         super(fm);
+        this.mFragmentList = fragments;
+        this.mFragmentTitleList = titles;
     }
 
     @Override
@@ -21,15 +22,10 @@ public class FragmentTabAdapter extends FragmentStatePagerAdapter {
         return mFragmentList.get(position);
     }
 
-    public void addFragment(Fragment fragment, String title) {
-        mFragmentList.add(fragment);
-        FragmentTitleList.add(title);
-    }
-
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
-        return FragmentTitleList.get(position);
+        return mFragmentTitleList.get(position);
     }
 
     @Override

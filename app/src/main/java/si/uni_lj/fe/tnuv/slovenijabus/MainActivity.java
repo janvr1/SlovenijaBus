@@ -29,7 +29,6 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements DownloadCallback {
 
-    private Calendar calendar;
     private int year, month, day, end_day;
     private TextView dateView;
     private AutoCompleteTextView entryView;
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
         month = calendar.get(Calendar.MONTH); // hint: Android šteje mesece od 0
         day = calendar.get(Calendar.DAY_OF_MONTH);

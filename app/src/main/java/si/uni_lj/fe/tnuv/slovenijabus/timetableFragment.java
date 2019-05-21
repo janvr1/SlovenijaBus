@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -29,17 +30,14 @@ public class timetableFragment extends Fragment implements DownloadCallback {
     public static final String API_podatki_relacija =
             "https://www.ap-ljubljana.si/_vozni_red/get_linija_info_0.php"; // POST request
 
-
     List<List<HashMap<String, String>>> listOfChildGroups;
     SimpleExpandableListAdapter adapter;
-
     public ArrayList<Integer> alreadyDownloadedLines = new ArrayList<>();
-
     ExpandableListView lv;
-
+    TextView msg;
     private static final String ARG_REQUEST_STRING = "req_str";
-
     private String request_string;
+    ArrayList<HashMap<String, String>> timetable;
 
     public timetableFragment() {
     }
@@ -66,6 +64,7 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_timetable, container, false);
+        msg = view.findViewById(R.id.fragment_message);
         lv = view.findViewById(R.id.show_all_list);
         return view;
     }
@@ -114,12 +113,12 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         for (String s : splitted) {
             String[] separated = s.split("\\|");
 
-            String time_str = separated[6];
+            String time_str = separated[6].substring(0, separated[6].length() - 3);
             Log.d("time_string", time_str);
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             String now = sdf.format(new Date());
             Log.d("time_string_now", now);
-            if (now.compareTo(time_str) <= 0) {
+            if (now.compareTo(time_str) < 1) {
 
                 HashMap<String, String> timetable = new HashMap<>();
                 timetable.put("entry_time", separated[6].substring(11, 16).replaceFirst("^0+(?!$)", ""));
@@ -153,7 +152,14 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         }
 
         if (request.get("url").equals(API_voznired)) {
-            final ArrayList<HashMap<String, String>> timetable = timetableParserCurrent(result_string);
+            timetable = timetableParserCurrent(result_string);
+
+            if (timetable.isEmpty()) {
+                msg.setText("Zamudil si vse avtobuse :(");
+                msg.setVisibility(View.VISIBLE);
+            } else {
+                lv.setVisibility(View.VISIBLE);
+            }
 
             listOfChildGroups = new ArrayList<List<HashMap<String, String>>>();
             for (int i = 0; i < timetable.size(); i++) {
@@ -287,4 +293,21 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         request.put("group", Integer.toString(i));
         makeHttpRequest(request);
     }
+
+/*    public void resumeFragment() {
+        lv.setAdapter(adapter);
+        lv.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                if (alreadyDownloadedLines.contains(groupPosition)) {
+                    return;
+                }
+                HashMap<String, String> group = (HashMap<String, String>) adapter.getGroup(groupPosition);
+                String req_data = group.get("line_data");
+                getLineDataFromAPI(req_data, groupPosition);
+                alreadyDownloadedLines.add(groupPosition);
+            }
+        });
+    }*/
+
 }

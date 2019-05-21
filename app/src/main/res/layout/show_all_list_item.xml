@@ -1,103 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/list_item"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:orientation="horizontal"
-    android:paddingVertical="16dp"
-    android:paddingLeft="32dp"
-    android:animateLayoutChanges="true">
+    android:paddingLeft="48dp"
+    android:paddingTop="8dp"
+    android:paddingRight="48dp"
+    android:paddingBottom="8dp"
+    android:gravity="center_horizontal">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingRight="16dp"
-        android:id="@+id/entry_layout"
-        android:layout_alignParentLeft="true">
+        android:layout_weight="1">
 
         <TextView
+            android:id="@+id/entry_time_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/departure"
-            android:textSize="20sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
             android:paddingRight="8dp"
-            android:text="@string/semicolon"
+            android:text="@string/departure"
             android:textSize="20sp" />
 
         <TextView
             android:id="@+id/entry_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/entry_time_text"
+            android:layout_alignLeft="@id/duration"
+            android:layout_toRightOf="@id/entry_time_text"
+            android:textColor="@android:color/primary_text_light"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/primary_text_light" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingRight="48dp"
-        android:id="@+id/exit_layout"
-        android:layout_alignBaseline="@id/entry_layout"
-        android:layout_alignParentRight="true">
+            android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/duration_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/entry_time_text"
+            android:paddingRight="8dp"
+            android:text="@string/duration"
+            android:textSize="18sp" />
+
+
+        <TextView
+            android:id="@+id/duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+            android:layout_below="@id/entry_time"
+            android:layout_alignBaseline="@id/duration_text"
+            android:layout_toRightOf="@id/duration_text"
+            android:textColor="#323232"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingLeft="16dp">
+
+        <TextView
+            android:id="@+id/exit_time_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="8dp"
+            android:layout_alignParentLeft="true"
             android:text="@string/arrival"
             android:textSize="20sp" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="8dp"
-            android:text="@string/semicolon"
-            android:textSize="20sp" />
-
-        <TextView
             android:id="@+id/exit_time"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="#323232"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#323232" />
-    </LinearLayout>
+            android:layout_toRightOf="@id/exit_time_text"
+            android:textStyle="bold" />
+    </RelativeLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/duration_layout"
-        android:layout_below="@id/entry_layout">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/duration"
-            android:textSize="18sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="8dp"
-            android:text="@string/semicolon"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/duration"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#323232" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>

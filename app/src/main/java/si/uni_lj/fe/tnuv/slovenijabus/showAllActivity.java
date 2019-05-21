@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -19,6 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 public class showAllActivity extends AppCompatActivity {
@@ -52,8 +54,6 @@ public class showAllActivity extends AppCompatActivity {
 
         String request_data2 = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date2;
         String request_data3 = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date3;
-        Log.d("req_str", request_data2);
-        Log.d("req_str", request_data3);
 
         String entryName = MainActivity.stations_map.get(entryStationID);
         String exitName = MainActivity.stations_map.get(exitStationID);
@@ -66,11 +66,19 @@ public class showAllActivity extends AppCompatActivity {
         ViewPager viewPager = findViewById(R.id.viewPager);
         TabLayout tabLayout = findViewById(R.id.tabLayout);
 
-        FragmentTabAdapter adapter = new FragmentTabAdapter(getSupportFragmentManager());
-        adapter.addFragment(timetableFragment.newInstance(request_data), date);
-        adapter.addFragment(timetableFragment.newInstance(request_data2), date2);
-        adapter.addFragment(timetableFragment.newInstance(request_data3), date3);
+        viewPager.setOffscreenPageLimit(2);
 
+        List<Fragment> fragmentList = new ArrayList<>();
+        fragmentList.add(timetableFragment.newInstance(request_data));
+        fragmentList.add(timetableFragment.newInstance(request_data2));
+        fragmentList.add(timetableFragment.newInstance(request_data3));
+
+        List<String> titleList = new ArrayList<>();
+        titleList.add(date);
+        titleList.add(date2);
+        titleList.add(date3);
+
+        FragmentTabAdapter adapter = new FragmentTabAdapter(getSupportFragmentManager(), fragmentList, titleList);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
     }
