@@ -8,14 +8,17 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -81,7 +84,7 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
         }
     }
 
-    public ArrayList<HashMap<String, String>> timetableParser(String input) {
+    public ArrayList<HashMap<String, String>> timetableParserAll(String input) {
         String[] splitted = input.split("\n");
         ArrayList<HashMap<String, String>> output = new ArrayList<>();
 
@@ -96,6 +99,34 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
             timetable.put("price", separated[9]);
             timetable.put("line_data", separated[13]);
             output.add(timetable);
+        }
+        return output;
+    }
+
+    public ArrayList<HashMap<String, String>> timetableParserCurrent(String input) {
+        String[] splitted = input.split("\n");
+        ArrayList<HashMap<String, String>> output = new ArrayList<>();
+
+        for (String s : splitted) {
+            String[] separated = s.split("\\|");
+
+            String time_str = separated[6];
+            Log.d("time_string", time_str);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String now = sdf.format(new Date());
+            Log.d("time_string_now", now);
+            if (now.compareTo(time_str) <= 0) {
+
+                HashMap<String, String> timetable = new HashMap<>();
+                timetable.put("entry_time", separated[6].substring(11, 16).replaceFirst("^0+(?!$)", ""));
+                timetable.put("exit_time", separated[7].substring(11, 16).replaceFirst("^0+(?!$)", ""));
+                timetable.put("entry_time_long", separated[6]);
+                timetable.put("exit_time_long", separated[7]);
+                timetable.put("duration", separated[8]);
+                timetable.put("price", separated[9]);
+                timetable.put("line_data", separated[13]);
+                output.add(timetable);
+            }
         }
         return output;
     }
@@ -118,7 +149,7 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
         }
 
         if (request.get("url").equals(API_voznired)) {
-            final ArrayList<HashMap<String, String>> timetable = timetableParser(result_string);
+            final ArrayList<HashMap<String, String>> timetable = timetableParserCurrent(result_string);
 
             listOfChildGroups = new ArrayList<List<HashMap<String, String>>>();
             for (int i = 0; i < timetable.size(); i++) {
@@ -176,7 +207,7 @@ public class showAllActivity extends AppCompatActivity implements DownloadCallba
                 HashMap<String, String> postaja = new HashMap<>();
                 postaja.put("label", s.get("time"));
                 if (s.containsKey("wait")) {
-                    postaja.put("data", s.get("station") + "(" + s.get("wait") + ")");
+                    postaja.put("data", s.get("station") + " (" + s.get("wait") + ")");
                 } else {
                     postaja.put("data", s.get("station"));
                 }
