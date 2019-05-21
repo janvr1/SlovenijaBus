@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
                 intent.putExtra(EXTRA_ENTRY, entryID);
                 intent.putExtra(EXTRA_EXIT, exitID);
-                intent.putExtra(EXTRA_DATE, dateStringBuilder(year, month, day));
+                intent.putExtra(EXTRA_DATE, dateView.getText().toString());
                 startActivity(intent);
 
             }
