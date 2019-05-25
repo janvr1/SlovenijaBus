@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
     SimpleAdapter favorites_adapter;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
