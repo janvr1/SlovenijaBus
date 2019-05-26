@@ -147,6 +147,9 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                 output.add(timetable);
             }
         }
+        if (first) {
+            first_index = output.size();
+        }
         HashMap<String, String> index = new HashMap<>();
         index.put("first_index", Integer.toString(first_index));
         output.add(index);
@@ -212,6 +215,7 @@ public class timetableFragment extends Fragment implements DownloadCallback {
             });
             lv.setSelectedGroup(first_index);
             lv.smoothScrollToPosition(first_index);
+            Log.d("first_index", Integer.toString(first_index));
         }
 
         if (request.get("url").equals(API_podatki_relacija)) {
@@ -316,21 +320,4 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         request.put("group", Integer.toString(i));
         makeHttpRequest(request);
     }
-
-/*    public void resumeFragment() {
-        lv.setAdapter(adapter);
-        lv.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-            @Override
-            public void onGroupExpand(int groupPosition) {
-                if (alreadyDownloadedLines.contains(groupPosition)) {
-                    return;
-                }
-                HashMap<String, String> group = (HashMap<String, String>) adapter.getGroup(groupPosition);
-                String req_data = group.get("line_data");
-                getLineDataFromAPI(req_data, groupPosition);
-                alreadyDownloadedLines.add(groupPosition);
-            }
-        });
-    }*/
-
 }
