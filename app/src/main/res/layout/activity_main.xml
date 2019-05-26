@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingLeft="32dp"
+    android:paddingRight="32dp"
     tools:context=".MainActivity">
 
     <AutoCompleteTextView
         android:id="@+id/vstopna_vnos"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
@@ -26,8 +26,6 @@
         android:id="@+id/izstopna_vnos"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
@@ -40,28 +38,23 @@
         android:id="@+id/prikazi_vse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:onClick="launchShowAll"
         android:text="@string/showAll_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.227"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/main_guidelineMid"
         app:layout_constraintTop_toBottomOf="@+id/datum_vnos" />
 
     <Button
         android:id="@+id/najdi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:text="@string/showSingle_button"
-        app:layout_constraintStart_toEndOf="@id/prikazi_vse"
-        app:layout_constraintTop_toBottomOf="@+id/datum_vnos" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/prikazi_vse"
+        app:layout_constraintStart_toStartOf="@+id/main_guidelineMid" />
 
     <Button
         android:id="@+id/datum_vnos"
@@ -76,16 +69,15 @@
         android:onClick="setDate"
         android:textSize="22sp"
         android:textStyle="normal"
+        app:layout_constraintBaseline_toBaselineOf="@id/datum_textview"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/izstopna_vnos" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/favorites_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginLeft="24dp"
         android:layout_marginTop="16dp"
         android:text="@string/favorites"
         android:textSize="20sp"
@@ -96,27 +88,22 @@
         android:id="@+id/favorites_listview"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/najdi" />
+        app:layout_constraintTop_toBottomOf="@+id/favorites_textView" />
 
     <TextView
         android:id="@+id/datum_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
         android:layout_marginTop="12dp"
-        android:layout_marginEnd="62dp"
-        android:layout_marginRight="62dp"
         android:layout_marginBottom="8dp"
         android:text="@string/date"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="@+id/datum_vnos"
-        app:layout_constraintEnd_toStartOf="@+id/datum_vnos"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/izstopna_vnos" />
 
@@ -126,10 +113,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginTop="8dp"
+
+        android:layout_marginBottom="8dp"
         android:background="@android:color/transparent"
         android:onClick="swapStations"
         android:scaleType="center"
@@ -138,6 +124,13 @@
         app:layout_constraintBottom_toBottomOf="@+id/izstopna_vnos"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/vstopna_vnos"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/vstopna_vnos" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/main_guidelineMid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
 
 </android.support.constraint.ConstraintLayout>

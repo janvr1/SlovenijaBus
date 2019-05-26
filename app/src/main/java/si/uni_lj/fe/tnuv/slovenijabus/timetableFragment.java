@@ -109,17 +109,21 @@ public class timetableFragment extends Fragment implements DownloadCallback {
     public ArrayList<HashMap<String, String>> timetableParserCurrent(String input) {
         String[] splitted = input.split("\n");
         ArrayList<HashMap<String, String>> output = new ArrayList<>();
-
-        for (String s : splitted) {
+        Boolean first = Boolean.TRUE;
+        int first_index = 0;
+        for (int i = 0; i < splitted.length; i++) {
+            String s = splitted[i];
             String[] separated = s.split("\\|");
-
             String time_str = separated[6].substring(0, separated[6].length() - 3);
             Log.d("time_string", time_str);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             String now = sdf.format(new Date());
             Log.d("time_string_now", now);
             if (now.compareTo(time_str) < 1) {
-
+                if (first) {
+                    first = Boolean.FALSE;
+                    first_index = i;
+                }
                 HashMap<String, String> timetable = new HashMap<>();
                 timetable.put("entry_time", separated[6].substring(11, 16).replaceFirst("^0+(?!$)", ""));
                 timetable.put("exit_time", separated[7].substring(11, 16).replaceFirst("^0+(?!$)", ""));
@@ -128,9 +132,24 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                 timetable.put("duration", separated[8]);
                 timetable.put("price", separated[9]);
                 timetable.put("line_data", separated[13]);
+                timetable.put("expired", "True");
+                output.add(timetable);
+            } else {
+                HashMap<String, String> timetable = new HashMap<>();
+                timetable.put("entry_time", separated[6].substring(11, 16).replaceFirst("^0+(?!$)", ""));
+                timetable.put("exit_time", separated[7].substring(11, 16).replaceFirst("^0+(?!$)", ""));
+                timetable.put("entry_time_long", separated[6]);
+                timetable.put("exit_time_long", separated[7]);
+                timetable.put("duration", separated[8]);
+                timetable.put("price", separated[9]);
+                timetable.put("line_data", separated[13]);
+                timetable.put("expired", "False");
                 output.add(timetable);
             }
         }
+        HashMap<String, String> index = new HashMap<>();
+        index.put("first_index", Integer.toString(first_index));
+        output.add(index);
         return output;
     }
 
@@ -153,9 +172,11 @@ public class timetableFragment extends Fragment implements DownloadCallback {
 
         if (request.get("url").equals(API_voznired)) {
             timetable = timetableParserCurrent(result_string);
+            int first_index = Integer.parseInt(timetable.get(timetable.size() - 1).get("first_index"));
+            timetable.remove(timetable.size() - 1);
 
             if (timetable.isEmpty()) {
-                msg.setText("Zamudil si vse avtobuse :(");
+                msg.setText(R.string.no_buses);
                 msg.setVisibility(View.VISIBLE);
             } else {
                 lv.setVisibility(View.VISIBLE);
@@ -189,6 +210,8 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                     alreadyDownloadedLines.add(groupPosition);
                 }
             });
+            lv.setSelectedGroup(first_index);
+            lv.smoothScrollToPosition(first_index);
         }
 
         if (request.get("url").equals(API_podatki_relacija)) {
