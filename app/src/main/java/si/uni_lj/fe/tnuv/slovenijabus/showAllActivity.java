@@ -3,6 +3,7 @@ package si.uni_lj.fe.tnuv.slovenijabus;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -35,6 +36,9 @@ public class showAllActivity extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.show_all_toolbar);
         setSupportActionBar(myToolbar);
         //getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if (Build.VERSION.SDK_INT >= 21) {
+            getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
 
         Intent intent = getIntent();
         String date = intent.getStringExtra(MainActivity.EXTRA_DATE);

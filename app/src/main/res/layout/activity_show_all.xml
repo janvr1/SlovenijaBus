@@ -10,14 +10,15 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
-        android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:paddingRight="16dp"
+            android:paddingLeft="0dp">
 
             <TextView
                 android:id="@+id/show_all_entry_text"
@@ -29,7 +30,7 @@
                 android:textSize="16sp"
                 android:textColor="@android:color/secondary_text_dark"
                 app:layout_constraintBottom_toTopOf="@+id/guidelineToolbarMid"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/show_all_exit_text"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
@@ -55,7 +56,8 @@
                 android:text="@string/exit"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/show_all_entry_text"
+                app:layout_constraintStart_toStartOf="parent"
+
                 app:layout_constraintTop_toTopOf="@+id/guidelineToolbarMid" />
 
             <TextView
@@ -99,7 +101,6 @@
                 android:background="@android:color/transparent"
                 android:onClick="changeDirection"
                 android:paddingLeft="8dp"
-                android:paddingRight="16dp"
                 android:src="@drawable/swap_arrows_horizontal_white"
                 android:text="@string/change_direction"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -127,12 +128,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tabLayout" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/show_all_guidelineMid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
 
 </android.support.constraint.ConstraintLayout>

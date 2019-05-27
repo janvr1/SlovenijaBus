@@ -27,6 +27,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
+
 public class MainActivity extends AppCompatActivity implements DownloadCallback {
 
     private int year, month, day, end_day;

@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
-import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 
 public class timetableFragment extends Fragment implements DownloadCallback {
 
@@ -31,7 +31,7 @@ public class timetableFragment extends Fragment implements DownloadCallback {
             "https://www.ap-ljubljana.si/_vozni_red/get_linija_info_0.php"; // POST request
 
     List<List<HashMap<String, String>>> listOfChildGroups;
-    SimpleExpandableListAdapter adapter;
+    CustomExpandableListAdapter adapter;
     public ArrayList<Integer> alreadyDownloadedLines = new ArrayList<>();
     ExpandableListView lv;
     TextView msg;
@@ -201,9 +201,9 @@ public class timetableFragment extends Fragment implements DownloadCallback {
             int[] childToArray = {R.id.dropdown_item_label, R.id.dropdown_item_data};
 
 
-            adapter = new SimpleExpandableListAdapter(getActivity().getApplicationContext(),
+            adapter = new CustomExpandableListAdapter(getActivity().getApplicationContext(),
                     timetable, R.layout.show_all_list_item, parentFromArray, parentToArray,
-                    listOfChildGroups, R.layout.dropdown_list_item, childFromArray, childToArray);
+                    listOfChildGroups, R.layout.dropdown_list_item, childFromArray, childToArray, first_index);
             lv.setAdapter(adapter);
             lv.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
                 @Override
@@ -214,7 +214,7 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                     HashMap<String, String> group = (HashMap<String, String>) adapter.getGroup(groupPosition);
                     String req_data = group.get("line_data");
                     getLineDataFromAPI(req_data, groupPosition);
-                    alreadyDownloadedLines.add(groupPosition);
+
                 }
             });
             lv.setSelectedGroup(first_index);
@@ -223,13 +223,14 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         }
 
         if (request.get("url").equals(API_podatki_relacija)) {
+            int groupPosition = Integer.parseInt(request.get("group"));
             if (result_string.equals("error")) {
                 Toast.makeText(getActivity().getApplicationContext(), R.string.network_error_message, Toast.LENGTH_LONG).show();
+                //lv.collapseGroup(groupPosition);
                 return;
             }
-            HashMap<String, Object> line_data = lineDataParser(result_string);
 
-            int groupPosition = Integer.parseInt(request.get("group"));
+            HashMap<String, Object> line_data = lineDataParser(result_string);
             List childGroup = listOfChildGroups.get(groupPosition);
 
             HashMap<String, String> prevoznikmap = new HashMap<>();
@@ -253,7 +254,7 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                 }
                 childGroup.add(postaja);
             }
-
+            alreadyDownloadedLines.add(groupPosition);
             adapter.notifyDataSetChanged();
         }
     }
