@@ -35,9 +35,9 @@ public class showAllActivity extends AppCompatActivity {
 
         Toolbar myToolbar = findViewById(R.id.show_all_toolbar);
         setSupportActionBar(myToolbar);
-        //getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         if (Build.VERSION.SDK_INT >= 21) {
-            getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+            getWindow().setStatusBarColor(getColor(R.color.colorPrimaryDark));
         }
 
         Intent intent = getIntent();

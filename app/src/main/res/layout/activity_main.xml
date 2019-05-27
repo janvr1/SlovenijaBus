@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="32dp"
-    android:paddingRight="32dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
     tools:context=".MainActivity">
 
     <AutoCompleteTextView
@@ -43,6 +43,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:onClick="launchShowAll"
+        android:background="@android:color/transparent"
         android:text="@string/showAll_button"
         app:layout_constraintEnd_toStartOf="@+id/main_guidelineMid"
         app:layout_constraintTop_toBottomOf="@+id/datum_vnos" />
@@ -50,6 +51,7 @@
     <Button
         android:id="@+id/najdi"
         android:layout_width="wrap_content"
+        android:background="@android:color/transparent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
@@ -70,7 +72,6 @@
         android:onClick="setDate"
         android:textSize="22sp"
         android:textStyle="normal"
-        app:layout_constraintBaseline_toBaselineOf="@id/datum_textview"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/izstopna_vnos" />
@@ -96,17 +97,26 @@
         app:layout_constraintTop_toBottomOf="@+id/favorites_textView"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <TextView
-        android:id="@+id/datum_textview"
+    <!--    <TextView
+            android:id="@+id/datum_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/date"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="@+id/datum_vnos"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/izstopna_vnos" />-->
+
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/date"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="@+id/datum_vnos"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/izstopna_vnos" />
+        android:src="@drawable/date_icon_black"
+        app:layout_constraintEnd_toStartOf="@id/datum_vnos"
+        app:layout_constraintTop_toTopOf="@id/datum_vnos"
+        app:layout_constraintBottom_toBottomOf="@id/datum_vnos"
+        android:paddingRight="16dp" />
 
     <ImageButton
         android:id="@+id/imageButton"

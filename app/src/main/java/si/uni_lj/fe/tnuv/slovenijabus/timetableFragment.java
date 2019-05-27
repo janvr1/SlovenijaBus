@@ -214,7 +214,6 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                     HashMap<String, String> group = (HashMap<String, String>) adapter.getGroup(groupPosition);
                     String req_data = group.get("line_data");
                     getLineDataFromAPI(req_data, groupPosition);
-
                 }
             });
             lv.setSelectedGroup(first_index);

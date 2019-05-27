@@ -5,27 +5,21 @@
     android:layout_height="match_parent"
     tools:context=".timetableFragment">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/fragment_message"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="16dp"
+        android:textSize="20sp"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/fragment_message"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:gravity="center"
-            android:padding="16dp"
-            android:visibility="gone"
-            android:text="Test" />
-
-        <ExpandableListView
-            android:visibility="gone"
-            android:id="@+id/show_all_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            android:childDivider="#00000000" />
-    </LinearLayout>
+    <ExpandableListView
+        android:id="@+id/show_all_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:childDivider="#00000000"
+        android:visibility="gone" />
 
 </FrameLayout>

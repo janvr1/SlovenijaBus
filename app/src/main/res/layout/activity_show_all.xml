@@ -17,8 +17,8 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingRight="16dp"
-            android:paddingLeft="0dp">
+            android:paddingLeft="0dp"
+            android:paddingRight="16dp">
 
             <TextView
                 android:id="@+id/show_all_entry_text"
@@ -27,8 +27,8 @@
                 android:paddingTop="8dp"
                 android:paddingRight="8dp"
                 android:text="@string/entry"
-                android:textSize="16sp"
                 android:textColor="@android:color/secondary_text_dark"
+                android:textSize="16sp"
                 app:layout_constraintBottom_toTopOf="@+id/guidelineToolbarMid"
                 app:layout_constraintEnd_toEndOf="@id/show_all_exit_text"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -37,11 +37,11 @@
                 android:id="@+id/show_all_vstop"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:textStyle="normal"
-                android:maxLines="1"
-                android:ellipsize="end"
                 app:layout_constraintBaseline_toBaselineOf="@id/show_all_entry_text"
                 app:layout_constraintEnd_toStartOf="@id/favorite_button"
                 app:layout_constraintStart_toEndOf="@id/show_all_entry_text" />
@@ -50,10 +50,10 @@
                 android:id="@+id/show_all_exit_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
                 android:paddingRight="8dp"
-                android:textColor="@android:color/secondary_text_dark"
+                android:paddingBottom="8dp"
                 android:text="@string/exit"
+                android:textColor="@android:color/secondary_text_dark"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -64,11 +64,11 @@
                 android:id="@+id/show_all_izstop"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:textStyle="normal"
-                android:maxLines="1"
-                android:ellipsize="end"
                 app:layout_constraintBaseline_toBaselineOf="@id/show_all_exit_text"
                 app:layout_constraintEnd_toStartOf="@id/favorite_button"
                 app:layout_constraintStart_toEndOf="@id/show_all_exit_text" />
@@ -86,8 +86,8 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:onClick="favoritesButton"
-                android:paddingRight="8dp"
                 android:paddingLeft="16dp"
+                android:paddingRight="8dp"
                 android:src="@drawable/heart_empty_white"
                 android:text="@string/favorite"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -114,11 +114,11 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabIndicatorColor="@color/colorAccent"
         android:minHeight="?actionBarSize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/show_all_toolbar" />
+        app:layout_constraintTop_toBottomOf="@id/show_all_toolbar"
+        app:tabIndicatorColor="@color/colorAccent" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"

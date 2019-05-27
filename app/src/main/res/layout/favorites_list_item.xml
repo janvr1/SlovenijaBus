@@ -10,20 +10,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
         android:paddingRight="8dp"
         android:text="@string/entry"
         android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline_favoritesMid"
         app:layout_constraintEnd_toEndOf="@id/favorites_exit"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/favorites_from"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:textStyle="bold"
+        android:maxLines="1"
+        android:ellipsize="end"
         app:layout_constraintBaseline_toBaselineOf="@+id/favorites_entry"
-        app:layout_constraintStart_toEndOf="@id/favorites_entry" />
+        app:layout_constraintStart_toEndOf="@id/favorites_entry"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/favorites_exit"
@@ -35,17 +40,27 @@
         android:text="@string/exit"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/favorites_entry"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline_favoritesMid" />
 
     <TextView
         android:id="@+id/favorites_to"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:textStyle="bold"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:scrollHorizontally="true"
         app:layout_constraintBaseline_toBaselineOf="@id/favorites_exit"
-        app:layout_constraintStart_toEndOf="@id/favorites_exit" />
+        app:layout_constraintStart_toEndOf="@id/favorites_exit"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_favoritesMid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
 
 </android.support.constraint.ConstraintLayout>
