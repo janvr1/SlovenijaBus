@@ -181,5 +181,6 @@ public class showAllActivity extends AppCompatActivity {
         newIntent.putExtra(MainActivity.EXTRA_EXIT, entryStationID);
         newIntent.putExtra(MainActivity.EXTRA_DATE, date);
         startActivity(newIntent);
+        finish();
     }
 }

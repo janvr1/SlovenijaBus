@@ -35,26 +35,53 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/vstopna_vnos" />
 
-    <Button
+    <!--    <Button
+            android:id="@+id/prikazi_vse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@android:color/transparent"
+            android:onClick="launchShowAll"
+            android:text="@string/showAll_button"
+            app:layout_constraintEnd_toStartOf="@+id/main_guidelineMid"
+            app:layout_constraintTop_toBottomOf="@+id/datum_vnos" />
+
+        <Button
+            android:id="@+id/najdi"
+            android:layout_width="wrap_content"
+            android:background="@android:color/transparent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/showSingle_button"
+            app:layout_constraintBaseline_toBaselineOf="@+id/prikazi_vse"
+            app:layout_constraintStart_toStartOf="@+id/main_guidelineMid" />-->
+
+    <TextView
         android:id="@+id/prikazi_vse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@android:color/transparent"
+        android:layout_marginEnd="16dp"
         android:onClick="launchShowAll"
         android:text="@string/showAll_button"
+        android:textColor="@android:color/primary_text_light"
+        android:textSize="20sp"
+        android:textStyle="normal"
         app:layout_constraintEnd_toStartOf="@+id/main_guidelineMid"
         app:layout_constraintTop_toBottomOf="@+id/datum_vnos" />
 
-    <Button
+    <TextView
         android:id="@+id/najdi"
         android:layout_width="wrap_content"
-        android:background="@android:color/transparent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
         android:text="@string/showSingle_button"
+        android:textColor="@android:color/primary_text_light"
+        android:textSize="20sp"
+        android:textStyle="normal"
         app:layout_constraintBaseline_toBaselineOf="@+id/prikazi_vse"
         app:layout_constraintStart_toStartOf="@+id/main_guidelineMid" />
 
@@ -82,6 +109,7 @@
         android:layout_marginTop="16dp"
         android:text="@string/favorites"
         android:textSize="20sp"
+        android:textColor="@android:color/primary_text_light"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/prikazi_vse" />
 
@@ -91,10 +119,10 @@
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/favorites_textView"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/favorites_textView" />
 
     <!--    <TextView
             android:id="@+id/datum_textview"
@@ -111,11 +139,11 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingRight="16dp"
         android:src="@drawable/date_icon_black"
-        app:layout_constraintEnd_toStartOf="@id/datum_vnos"
-        app:layout_constraintTop_toTopOf="@id/datum_vnos"
         app:layout_constraintBottom_toBottomOf="@id/datum_vnos"
-        android:paddingRight="16dp" />
+        app:layout_constraintEnd_toStartOf="@id/datum_vnos"
+        app:layout_constraintTop_toTopOf="@id/datum_vnos" />
 
     <ImageButton
         android:id="@+id/imageButton"
