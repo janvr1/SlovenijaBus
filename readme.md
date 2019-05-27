@@ -3,7 +3,7 @@
 * Animacije (https://github.com/AvinashChowdary/AnimatedExpandableListView)
 * Dizajn
 * Tretji screen
-* Obarvanje zamujenih busov sivo (verjetno treba custom adapter za expandableListView)
+* Popravit view za favorites, da bo pravilno prikazal več vrstic (ali pa omejit na eno vrstico)
 * Favorites shranit v DB namesto sharedPreferences
 * Zgodovina iskanja? (isto DB)
 * Prenos voznih redov za offline pregled
