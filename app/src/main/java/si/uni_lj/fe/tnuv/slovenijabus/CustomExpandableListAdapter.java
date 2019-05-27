@@ -17,15 +17,18 @@
 package si.uni_lj.fe.tnuv.slovenijabus;
 
 import android.content.Context;
+import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +58,10 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     private int[] mChildTo;
 
     private int mIndex;
-    Context mContext;
+    private Context mContext;
+    private int expired_color;
+    private int defaultChildTextColor;
+    private List<Integer> defaultGroupTextColors;
 
     private LayoutInflater mInflater;
 
@@ -104,6 +110,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                 childLayout, childLayout, childFrom, childTo);
         mContext = context;
         mIndex = index;
+        expired_color = mContext.getColor(R.color.expiredColor);
     }
 
     /**
@@ -230,14 +237,24 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
-        View v;
+        LinearLayout ll;
         if (convertView == null) {
-            v = newChildView(isLastChild, parent);
+            ll = (LinearLayout) newChildView(isLastChild, parent);
+            defaultChildTextColor = ((TextView) ll.getChildAt(0)).getCurrentTextColor();
+            if (groupPosition < mIndex) {
+                setAllTextColor(ll, expired_color);
+            }
         } else {
-            v = convertView;
+            ll = (LinearLayout) convertView;
+            if (groupPosition < mIndex) {
+                setAllTextColor(ll, expired_color);
+            } else {
+                setAllTextColor(ll, defaultChildTextColor);
+            }
         }
-        bindView(v, mChildData.get(groupPosition).get(childPosition), mChildFrom, mChildTo);
-        return v;
+
+        bindView(ll, mChildData.get(groupPosition).get(childPosition), mChildFrom, mChildTo);
+        return ll;
     }
 
     /**
@@ -281,26 +298,25 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {
         View v;
+        ConstraintLayout cl;
         if (convertView == null) {
-            v = newGroupView(isExpanded, parent);
+            cl = (ConstraintLayout) newGroupView(isExpanded, parent);
+            defaultGroupTextColors = getTextColors(cl);
             if (groupPosition < mIndex) {
-                v.setBackgroundColor(mContext.getResources().getColor(R.color.expiredColor));
-            } else {
-                v.setBackgroundColor(mContext.getResources().getColor(R.color.bgColor));
+                setAllTextColor(cl, expired_color);
             }
-
         } else {
-            v = convertView;
+            cl = (ConstraintLayout) convertView;
             if (groupPosition < mIndex) {
-                v.setBackgroundColor(mContext.getResources().getColor(R.color.expiredColor));
+                setAllTextColor(cl, expired_color);
             } else {
-                v.setBackgroundColor(mContext.getResources().getColor(R.color.bgColor));
+                setTextColors(cl, defaultGroupTextColors);
             }
         }
         Log.d("adapter_group_position", Integer.toString(groupPosition));
         Log.d("adapter_index", Integer.toString(mIndex));
-        bindView(v, mGroupData.get(groupPosition), mGroupFrom, mGroupTo);
-        return v;
+        bindView(cl, mGroupData.get(groupPosition), mGroupFrom, mGroupTo);
+        return cl;
     }
 
     /**
@@ -321,6 +337,43 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     public boolean hasStableIds() {
         return true;
+    }
+
+    public void setAllTextColor(ViewGroup vg, int color) {
+        int child_num = vg.getChildCount();
+        for (int i = 0; i < child_num; i++) {
+            try {
+                TextView tv = (TextView) vg.getChildAt(i);
+                tv.setTextColor(color);
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public List<Integer> getTextColors(ViewGroup vg) {
+        int child_num = vg.getChildCount();
+        List<Integer> colors = new ArrayList<>();
+        for (int i = 0; i < child_num; i++) {
+            View v = vg.getChildAt(i);
+            if (v instanceof TextView) {
+                TextView tv = (TextView) vg.getChildAt(i);
+                colors.add(tv.getCurrentTextColor());
+            }
+        }
+        return colors;
+    }
+
+    public void setTextColors(ViewGroup vg, List<Integer> clrs) {
+        int child_num = vg.getChildCount();
+        for (int i = 0, j = 0; i < child_num; i++) {
+            View v = vg.getChildAt(i);
+            if (v instanceof TextView) {
+                TextView tv = (TextView) vg.getChildAt(i);
+                tv.setTextColor(clrs.get(j));
+                j++;
+            }
+        }
+
     }
 
 }

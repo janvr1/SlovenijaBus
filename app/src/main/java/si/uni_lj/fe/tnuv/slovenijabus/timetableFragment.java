@@ -209,6 +209,8 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                 @Override
                 public void onGroupExpand(int groupPosition) {
                     if (alreadyDownloadedLines.contains(groupPosition)) {
+                        lv.setSelectedGroup(groupPosition);
+                        lv.smoothScrollToPosition(groupPosition);
                         return;
                     }
                     HashMap<String, String> group = (HashMap<String, String>) adapter.getGroup(groupPosition);
@@ -255,6 +257,8 @@ public class timetableFragment extends Fragment implements DownloadCallback {
             }
             alreadyDownloadedLines.add(groupPosition);
             adapter.notifyDataSetChanged();
+            lv.setSelectedGroup(groupPosition);
+            lv.smoothScrollToPosition(groupPosition);
         }
     }
 

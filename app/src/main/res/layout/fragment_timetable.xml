@@ -20,6 +20,7 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:childDivider="#00000000"
-        android:visibility="gone" />
+        android:visibility="gone"
+        android:transcriptMode="disabled" />
 
 </FrameLayout>
