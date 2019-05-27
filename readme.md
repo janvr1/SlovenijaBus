@@ -1,5 +1,6 @@
 ### Stvari za implementacijo:
 * Splash screen
+* Main screen v landscape orientaciji (dodat ScrollView?)
 * Animacije (https://github.com/AvinashChowdary/AnimatedExpandableListView)
 * Dizajn (+title bar)
 * Tretji screen
