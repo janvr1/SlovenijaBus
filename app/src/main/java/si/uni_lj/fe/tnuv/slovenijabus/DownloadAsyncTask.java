@@ -22,6 +22,9 @@ public class DownloadAsyncTask extends AsyncTask<HashMap<String, String>, Void, 
         this.caller = caller;
     }
 
+    DownloadAsyncTask() {
+    }
+
     @Override
     protected HashMap<String, Object> doInBackground(HashMap<String, String>... in) {
         HashMap input = in[0];

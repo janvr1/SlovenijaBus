@@ -12,15 +12,18 @@
         android:roundIcon="@mipmap/ic_launcher_bus_round"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-        <activity android:name=".DownloadAsyncTask" />
-        <activity android:name=".showAllActivity" />
-        <activity android:name=".MainActivity">
+
+        <activity
+            android:name=".showAllActivity"
+            android:theme="@style/AppThemeNoActionBar" />
+        <activity android:name=".MainActivity"></activity>
+        <activity
+            android:name=".SplashActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
-
 </manifest>
