@@ -109,7 +109,7 @@ public class timetableFragment extends Fragment implements DownloadCallback {
     public ArrayList<HashMap<String, String>> timetableParserCurrent(String input) {
         String[] splitted = input.split("\n");
         ArrayList<HashMap<String, String>> output = new ArrayList<>();
-        Boolean first = Boolean.TRUE;
+        boolean first = true;
         int first_index = 0;
         for (int i = 0; i < splitted.length; i++) {
             String s = splitted[i];
@@ -121,7 +121,7 @@ public class timetableFragment extends Fragment implements DownloadCallback {
             Log.d("time_string_now", now);
             if (now.compareTo(time_str) < 1) {
                 if (first) {
-                    first = Boolean.FALSE;
+                    first = false;
                     first_index = i;
                 }
                 HashMap<String, String> timetable = new HashMap<>();
@@ -163,27 +163,31 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         HashMap<String, String> request = (HashMap<String, String>) result.get("request");
         String result_string = (String) result.get("response");
 
-        if (result_string.length() < 2) {
-            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.no_buses_message), Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        if (result_string.equals("error")) {
-            Toast.makeText(getActivity().getApplicationContext(), R.string.network_error_message, Toast.LENGTH_LONG).show();
-            return;
-        }
-
         if (request.get("url").equals(API_voznired)) {
+
+            if (result_string.equals("error")) {
+                //Toast.makeText(getActivity().getApplicationContext(), R.string.network_error_message, Toast.LENGTH_LONG).show();
+                msg.setText(R.string.network_error_message);
+                msg.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            if (result_string.length() < 2) {
+                //Toast.makeText(getActivity().getApplicationContext(), getString(R.string.no_buses_message), Toast.LENGTH_LONG).show();
+                msg.setText(R.string.no_buses_message);
+                msg.setVisibility(View.VISIBLE);
+                return;
+            }
+
             timetable = timetableParserCurrent(result_string);
             int first_index = Integer.parseInt(timetable.get(timetable.size() - 1).get("first_index"));
             timetable.remove(timetable.size() - 1);
 
-            if (timetable.isEmpty()) {
-                msg.setText(R.string.no_buses);
-                msg.setVisibility(View.VISIBLE);
-            } else {
-                lv.setVisibility(View.VISIBLE);
-            }
+            /*if (timetable.size()-1 == first_index) {
+                Toast.makeText(getActivity().getApplicationContext(), R.string.no_buses_left_on_this_day, Toast.LENGTH_LONG).show();
+            }*/
+
+            lv.setVisibility(View.VISIBLE);
 
             listOfChildGroups = new ArrayList<List<HashMap<String, String>>>();
             for (int i = 0; i < timetable.size(); i++) {
@@ -219,6 +223,10 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         }
 
         if (request.get("url").equals(API_podatki_relacija)) {
+            if (result_string.equals("error")) {
+                Toast.makeText(getActivity().getApplicationContext(), R.string.network_error_message, Toast.LENGTH_LONG).show();
+                return;
+            }
             HashMap<String, Object> line_data = lineDataParser(result_string);
 
             int groupPosition = Integer.parseInt(request.get("group"));

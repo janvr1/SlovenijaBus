@@ -3,92 +3,121 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:orientation="vertical">
+    android:animateLayoutChanges="true">
 
-    <TextView
-        android:id="@+id/show_all_entry_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:paddingTop="8dp"
-        android:paddingRight="8dp"
-        android:paddingBottom="4dp"
-        android:text="@string/entry"
-        android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/show_all_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-    <TextView
-        android:id="@+id/show_all_vstop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingRight="16dp"
-        android:textColor="#323232"
-        android:textSize="18sp"
-        android:textStyle="normal"
-        app:layout_constraintBaseline_toBaselineOf="@id/show_all_entry_text"
-        app:layout_constraintStart_toEndOf="@id/show_all_entry_text" />
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/show_all_exit_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingRight="8dp"
-        android:paddingLeft="16dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="8dp"
-        android:text="@string/exit"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@id/show_all_entry_text"
-        app:layout_constraintTop_toBottomOf="@id/show_all_entry_text" />
+            <TextView
+                android:id="@+id/show_all_entry_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingRight="8dp"
+                android:text="@string/entry"
+                android:textSize="16sp"
+                android:textColor="@android:color/secondary_text_dark"
+                app:layout_constraintBottom_toTopOf="@+id/guidelineToolbarMid"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/show_all_izstop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingRight="16dp"
-        android:textColor="#323232"
-        android:textSize="18sp"
-        android:textStyle="normal"
-        app:layout_constraintStart_toEndOf="@id/show_all_exit_text"
-        app:layout_constraintBaseline_toBaselineOf="@id/show_all_exit_text" />
+            <TextView
+                android:id="@+id/show_all_vstop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="normal"
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:layout_constraintBaseline_toBaselineOf="@id/show_all_entry_text"
+                app:layout_constraintEnd_toStartOf="@id/favorite_button"
+                app:layout_constraintStart_toEndOf="@id/show_all_entry_text" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:onClick="addToFavorites"
-        android:src="@drawable/heart_full"
-        android:text="@string/favorite"
-        android:id="@+id/favorite_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/show_all_guidelineMid"
-        app:layout_constraintTop_toBottomOf="@id/show_all_exit_text" />
+            <TextView
+                android:id="@+id/show_all_exit_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:paddingRight="8dp"
+                android:textColor="@android:color/secondary_text_dark"
+                android:text="@string/exit"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/show_all_entry_text"
+                app:layout_constraintTop_toTopOf="@+id/guidelineToolbarMid" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="32dp"
-        android:layout_marginRight="32dp"
-        android:background="@android:color/transparent"
-        android:onClick="changeDirection"
-        android:scaleX="1.5"
-        android:src="@drawable/swap_arrows_horizontal"
-        android:text="@string/change_direction"
-        app:layout_constraintTop_toTopOf="@id/favorite_button"
-        app:layout_constraintStart_toEndOf="@id/show_all_guidelineMid"
-        app:layout_constraintEnd_toEndOf="parent" />
+            <TextView
+                android:id="@+id/show_all_izstop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="normal"
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:layout_constraintBaseline_toBaselineOf="@id/show_all_exit_text"
+                app:layout_constraintEnd_toStartOf="@id/favorite_button"
+                app:layout_constraintStart_toEndOf="@id/show_all_exit_text" />
 
+            <android.support.constraint.Guideline
+                android:id="@+id/guidelineToolbarMid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <ImageButton
+                android:id="@+id/favorite_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:onClick="favoritesButton"
+                android:paddingRight="8dp"
+                android:paddingLeft="16dp"
+                android:src="@drawable/heart_empty_white"
+                android:text="@string/favorite"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/show_all_swap_direction"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/show_all_swap_direction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:onClick="changeDirection"
+                android:paddingLeft="8dp"
+                android:paddingRight="16dp"
+                android:src="@drawable/swap_arrows_horizontal_white"
+                android:text="@string/change_direction"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.Toolbar>
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:tabIndicatorColor="@color/colorAccent"
         android:minHeight="?actionBarSize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/favorite_button" />
+        app:layout_constraintTop_toBottomOf="@id/show_all_toolbar" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
@@ -100,10 +129,10 @@
         app:layout_constraintTop_toBottomOf="@id/tabLayout" />
 
     <android.support.constraint.Guideline
+        android:id="@+id/show_all_guidelineMid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintGuide_percent="0.5"
         android:orientation="vertical"
-        android:id="@+id/show_all_guidelineMid" />
+        app:layout_constraintGuide_percent="0.5" />
 
 </android.support.constraint.ConstraintLayout>

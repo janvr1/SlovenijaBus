@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 favorites.remove(position);
                 favorites_adapter.notifyDataSetChanged();
                 writeFavorites(favorites);
-                Toast.makeText(MainActivity.this, "Item Deleted", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, R.string.remove_from_favorites, Toast.LENGTH_LONG).show();
                 return true;
             }
         });
@@ -210,12 +210,12 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     public void writeFavorites(ArrayList<HashMap<String, String>> fav) {
         SharedPreferences sharedPref = getSharedPreferences(
                 getString(R.string.preferences_key), Context.MODE_PRIVATE);
-
-        ArrayList<String> fav2 = new ArrayList<>();
+        Set<String> favorites = new LinkedHashSet<>();
+        //ArrayList<String> fav2 = new ArrayList<>();
         for (HashMap<String, String> map : fav) {
-            fav2.add(TextUtils.join(";", new String[]{map.get("from"), map.get("to")}));
+            favorites.add(TextUtils.join(";", new String[]{map.get("from"), map.get("to")}));
         }
-        Set<String> favorites = new LinkedHashSet<>(fav2);
+
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putStringSet("favorites", favorites);
         editor.apply();

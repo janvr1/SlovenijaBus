@@ -25,5 +25,6 @@
     <string name="exit">Izstop:</string>
     <string name="no_buses_message">Med izbranimi postajami ni avtobusov</string>
     <string name="add_to_favorites">Dodano med priljubljene</string>
-    <string name="no_buses">Zamudil si vse avtobuse :(</string>
+    <string name="no_buses_left_on_this_day">Zamudil si vse avtobuse :(</string>
+    <string name="remove_from_favorites">Odstranjeno izmed priljubljenih</string>
 </resources>

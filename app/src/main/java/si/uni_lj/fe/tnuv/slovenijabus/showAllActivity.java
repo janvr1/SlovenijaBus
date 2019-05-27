@@ -8,9 +8,11 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +31,10 @@ public class showAllActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_all);
+
+        Toolbar myToolbar = findViewById(R.id.show_all_toolbar);
+        setSupportActionBar(myToolbar);
+        //getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         Intent intent = getIntent();
         String date = intent.getStringExtra(MainActivity.EXTRA_DATE);
@@ -81,23 +87,53 @@ public class showAllActivity extends AppCompatActivity {
         FragmentTabAdapter adapter = new FragmentTabAdapter(getSupportFragmentManager(), fragmentList, titleList);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+
+        if (checkIfInFavorites(readFavorites(), entryStationID, exitStationID) > -1) {
+            ImageButton fav_btn = findViewById(R.id.favorite_button);
+            fav_btn.setImageResource(R.drawable.heart_full_white);
+        }
     }
 
-    public void addToFavorites(View view) {
+    public void favoritesButton(View view) {
         ArrayList<HashMap<String, String>> favorites = readFavorites();
 
         Intent intent = getIntent();
         String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
         String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
+        int index = checkIfInFavorites(favorites, entryStationID, exitStationID);
 
-        HashMap<String, String> newMap = new HashMap<>();
-        newMap.put("from", MainActivity.stations_map.get(entryStationID));
-        newMap.put("to", MainActivity.stations_map.get(exitStationID));
+        ImageButton fav_btn = findViewById(R.id.favorite_button);
 
-        favorites.add(newMap);
-        writeFavorites(favorites);
+        if (index == -1) { //dodamo
+            HashMap<String, String> newMap = new HashMap<>();
+            newMap.put("from", MainActivity.stations_map.get(entryStationID));
+            newMap.put("to", MainActivity.stations_map.get(exitStationID));
 
-        Toast.makeText(this, getString(R.string.add_to_favorites), Toast.LENGTH_SHORT).show();
+            favorites.add(newMap);
+            writeFavorites(favorites);
+            fav_btn.setImageResource(R.drawable.heart_full_white);
+            Toast.makeText(this, getString(R.string.add_to_favorites), Toast.LENGTH_LONG).show();
+        } else { //odstranimo
+            favorites.remove(index);
+            writeFavorites(favorites);
+            fav_btn.setImageResource(R.drawable.heart_empty_white);
+            Toast.makeText(this, getString(R.string.remove_from_favorites), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public int checkIfInFavorites(ArrayList<HashMap<String, String>> favorites,
+                                  String entryStationID, String exitStationID) {
+
+        // vrne indeks elementa če je že v favorites, če ni vrne -1
+        int index = -1;
+        for (int j = 0; j < favorites.size(); j++) {
+            HashMap<String, String> map = favorites.get(j);
+            if (map.get("from").equals(MainActivity.stations_map.get(entryStationID)) &&
+                    map.get("to").equals(MainActivity.stations_map.get(exitStationID))) {
+                index = j;
+            }
+        }
+        return index;
     }
 
     public ArrayList<HashMap<String, String>> readFavorites() {
@@ -119,12 +155,12 @@ public class showAllActivity extends AppCompatActivity {
     public void writeFavorites(ArrayList<HashMap<String, String>> fav) {
         SharedPreferences sharedPref = getSharedPreferences(
                 getString(R.string.preferences_key), Context.MODE_PRIVATE);
-
-        ArrayList<String> fav2 = new ArrayList<>();
+        Set<String> favorites = new LinkedHashSet<>();
+        //ArrayList<String> fav2 = new ArrayList<>();
         for (HashMap<String, String> map : fav) {
-            fav2.add(TextUtils.join(";", new String[]{map.get("from"), map.get("to")}));
+            favorites.add(TextUtils.join(";", new String[]{map.get("from"), map.get("to")}));
         }
-        Set<String> favorites = new LinkedHashSet<>(fav2);
+
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putStringSet("favorites", favorites);
         editor.apply();
