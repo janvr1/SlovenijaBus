@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -42,12 +41,13 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     public static final String API_postaje =
             "https://www.ap-ljubljana.si/_vozni_red/get_postajalisca_vsa_v2.php"; // GET request
 
-    public static Map<String, String> stations_map = new HashMap<>();
-
+    //public static Map<String, String> stations_map = new HashMap<>();
+    public ArrayList<String> station_names = new ArrayList<>();
     SimpleAdapter favorites_adapter;
+    ArrayAdapter<String> adapter;
     final ArrayList<HashMap<String, String>> favorites = new ArrayList<>();
 
-    DatabaseHelper favorites_db;
+    DatabaseHelper slovenijabus_DB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         setContentView(R.layout.activity_main);
 
         getStationsFromAPI();
-        favorites_db = DatabaseHelper.getInstance(this);
+        slovenijabus_DB = DatabaseHelper.getInstance(this);
 
         Calendar calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
@@ -71,7 +71,15 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
         ListView fav_lv = findViewById(R.id.favorites_listview);
 
-        favorites.addAll(favorites_db.readFavorites());
+        station_names.addAll(slovenijabus_DB.readStationsNames());
+        adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, station_names);
+        entryView.setAdapter(adapter);
+        exitView.setAdapter(adapter);
+
+        favorites.addAll(slovenijabus_DB.readFavorites());
+        //Log.d("main_db", slovenijabus_DB.getStationNameFromID("1"));
+        //Log.d("main_db", slovenijabus_DB.getStationIDFromName("LJUBLJANA AVTOBUSNA POSTAJA"));
         String[] fromArray = {"entry", "exit"};
         int[] toArray = {R.id.favorites_from, R.id.favorites_to};
 
@@ -91,8 +99,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 String exit = to.getText().toString();
                 favorites.remove(position);
                 favorites_adapter.notifyDataSetChanged();
-                favorites_db.removeFavorite(entry, exit);
-                dumpDBtoLog();
+                slovenijabus_DB.removeFavorite(entry, exit);
                 Toast.makeText(MainActivity.this, R.string.remove_from_favorites, Toast.LENGTH_LONG).show();
                 return true;
             }
@@ -102,8 +109,8 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 HashMap<String, String> clicked = favorites.get(position);
-                String entryID = stations_map.get(clicked.get("entry"));
-                String exitID = stations_map.get(clicked.get("exit"));
+                String entryID = slovenijabus_DB.getStationIDFromName(clicked.get("entry"));
+                String exitID = slovenijabus_DB.getStationIDFromName(clicked.get("exit"));
 
                 Intent intent = new Intent(getApplicationContext(), showAllActivity.class);
 
@@ -119,9 +126,9 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     protected void onStart() {
         super.onStart();
         favorites.clear();
-        favorites.addAll(favorites_db.readFavorites());
+        favorites.addAll(slovenijabus_DB.readFavorites());
         favorites_adapter.notifyDataSetChanged();
-        dumpDBtoLog();
+
     }
 
     public void setDate(View view) {
@@ -139,8 +146,8 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         String exitStation = exitView.getText().toString();
         String date = dateView.getText().toString();
         Intent intent = new Intent(this, showAllActivity.class);
-        intent.putExtra(EXTRA_ENTRY, stations_map.get(entryStation));
-        intent.putExtra(EXTRA_EXIT, stations_map.get(exitStation));
+        intent.putExtra(EXTRA_ENTRY, slovenijabus_DB.getStationIDFromName(entryStation));
+        intent.putExtra(EXTRA_EXIT, slovenijabus_DB.getStationIDFromName(exitStation));
         intent.putExtra(EXTRA_DATE, date);
         startActivity(intent);
     }
@@ -169,21 +176,22 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         exitView.setText(entry);
     }
 
-    public ArrayList<String> stationParser(String input) {
-        ArrayList<String> station_names = new ArrayList<>();
+    public Map<String, String> stationParser(String input) {
+        //ArrayList<String> station_names = new ArrayList<>();
         String[] splitted = input.split("\n");
+        Map<String, String> station_map = new HashMap<>();
 
         for (int i = 1; i < splitted.length; i++) {
             String current = splitted[i];
             if (current.charAt(0) == "0".charAt(0)) {
                 String x = current.substring(current.indexOf(":") + 1);
                 String[] separated = x.split("\\|");
-                stations_map.put(separated[1], separated[0]);
-                stations_map.put(separated[0], separated[1]);
-                station_names.add(separated[1]);
+                //stations_map.put(separated[1], separated[0]);
+                station_map.put(separated[0], separated[1]);
+                //station_names.add(separated[1]);
             }
         }
-        return station_names;
+        return station_map;
     }
 
     public ArrayList<HashMap<String, String>> readFavorites() {
@@ -217,12 +225,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         editor.apply();
     }
 
-    public void dumpDBtoLog() {
-        for (HashMap<String, String> hm : favorites_db.readFavorites()) {
-            Log.d("db", hm.toString());
-        }
-    }
-
     @Override
     public void updateFromDownload(Object res) {
         HashMap<String, Object> result = (HashMap<String, Object>) res;
@@ -235,12 +237,12 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
         if (request.get("url").equals(API_postaje)) {
             String stations_string = (String) result.get("response");
-            ArrayList<String> station_names = stationParser(stations_string);
-
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                    android.R.layout.simple_dropdown_item_1line, station_names);
-            entryView.setAdapter(adapter);
-            exitView.setAdapter(adapter);
+            //ArrayList<String> station_names = stationParser(stations_string);
+            Map<String, String> stations = stationParser(stations_string);
+            slovenijabus_DB.updateStations(stations);
+            station_names.clear();
+            station_names.addAll(slovenijabus_DB.readStationsNames());
+            adapter.notifyDataSetChanged();
 
             Toast.makeText(this, "Download postaj usepešen :)", Toast.LENGTH_SHORT).show();
         }

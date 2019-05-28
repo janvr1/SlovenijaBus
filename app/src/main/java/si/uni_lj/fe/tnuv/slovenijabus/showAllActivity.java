@@ -28,7 +28,7 @@ import java.util.Set;
 
 public class showAllActivity extends AppCompatActivity {
 
-    DatabaseHelper favorites_db;
+    DatabaseHelper slovenijabus_DB;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,7 +41,7 @@ public class showAllActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= 21) {
             getWindow().setStatusBarColor(getColor(R.color.colorPrimaryDark));
         }
-        favorites_db = DatabaseHelper.getInstance(this);
+        slovenijabus_DB = DatabaseHelper.getInstance(this);
 
         Intent intent = getIntent();
         String date = intent.getStringExtra(MainActivity.EXTRA_DATE);
@@ -68,8 +68,8 @@ public class showAllActivity extends AppCompatActivity {
         String request_data2 = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date2;
         String request_data3 = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date3;
 
-        String entryName = MainActivity.stations_map.get(entryStationID);
-        String exitName = MainActivity.stations_map.get(exitStationID);
+        String entryName = slovenijabus_DB.getStationNameFromID(entryStationID);
+        String exitName = slovenijabus_DB.getStationNameFromID(exitStationID);
 
         TextView vstop = findViewById(R.id.show_all_vstop);
         vstop.setText(entryName);
@@ -100,7 +100,7 @@ public class showAllActivity extends AppCompatActivity {
             fav_btn.setImageResource(R.drawable.heart_full_white);
         }*/
         Log.d("showAllActivity", entryName + " " + exitName);
-        if (favorites_db.checkIfIn(entryName, exitName)) {
+        if (slovenijabus_DB.checkIfIn(entryName, exitName)) {
             ImageButton fav_btn = findViewById(R.id.favorite_button);
             fav_btn.setImageResource(R.drawable.heart_full_white);
         }
@@ -112,23 +112,22 @@ public class showAllActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
         String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
-        String entryName = MainActivity.stations_map.get(entryStationID);
-        String exitName = MainActivity.stations_map.get(exitStationID);
+        String entryName = slovenijabus_DB.getStationNameFromID(entryStationID);
+        String exitName = slovenijabus_DB.getStationNameFromID(exitStationID);
         //int index = checkIfInFavorites(favorites, entryStationID, exitStationID);
-        boolean isIn = favorites_db.checkIfIn(entryName, exitName);
+        boolean isIn = slovenijabus_DB.checkIfIn(entryName, exitName);
 
         ImageButton fav_btn = findViewById(R.id.favorite_button);
 
         if (isIn) {
-            favorites_db.removeFavorite(entryName, exitName);
+            slovenijabus_DB.removeFavorite(entryName, exitName);
             fav_btn.setImageResource(R.drawable.heart_empty_white);
             Toast.makeText(this, getString(R.string.remove_from_favorites), Toast.LENGTH_LONG).show();
         } else {
-            favorites_db.addFavorite(entryName, exitName);
+            slovenijabus_DB.addFavorite(entryName, exitName);
             fav_btn.setImageResource(R.drawable.heart_full_white);
             Toast.makeText(this, getString(R.string.add_to_favorites), Toast.LENGTH_LONG).show();
         }
-        dumpDBtoLog();
 
 /*        if (index == -1) { //dodamo
             HashMap<String, String> newMap = new HashMap<>();
@@ -148,7 +147,7 @@ public class showAllActivity extends AppCompatActivity {
 
     }
 
-    public int checkIfInFavorites(ArrayList<HashMap<String, String>> favorites,
+/*    public int checkIfInFavorites(ArrayList<HashMap<String, String>> favorites,
                                   String entryStationID, String exitStationID) {
 
         // vrne indeks elementa če je že v favorites, če ni vrne -1
@@ -161,7 +160,7 @@ public class showAllActivity extends AppCompatActivity {
             }
         }
         return index;
-    }
+    }*/
 
     public ArrayList<HashMap<String, String>> readFavorites() {
         SharedPreferences sharedPref = getSharedPreferences(
@@ -208,7 +207,7 @@ public class showAllActivity extends AppCompatActivity {
     }
 
     public void dumpDBtoLog() {
-        for (HashMap<String, String> hm : favorites_db.readFavorites()) {
+        for (HashMap<String, String> hm : slovenijabus_DB.readFavorites()) {
             Log.d("db", hm.toString());
         }
     }

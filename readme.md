@@ -3,6 +3,5 @@
 * Animacije
 * Dizajn
 * Tretji screen
-* Favorites shranit v DB namesto sharedPreferences
-* Zadnja poizvedba view
+* Dodat en shortcut da ponoviš zadnje iskanje?
 * Prenos voznih redov za offline pregled
