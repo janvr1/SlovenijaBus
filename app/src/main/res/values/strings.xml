@@ -27,4 +27,8 @@
     <string name="add_to_favorites">Dodano med priljubljene</string>
     <string name="no_buses_left_on_this_day">Zamudil si vse avtobuse :(</string>
     <string name="remove_from_favorites">Odstranjeno izmed priljubljenih</string>
+    <string name="price">Cena:</string>
+    <string name="company">Prevoznik:</string>
+    <string name="line">Relacija:</string>
+    <string name="via_stations">Vmesne postaje</string>
 </resources>

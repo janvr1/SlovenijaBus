@@ -1,26 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:paddingStart="48dp"
-    android:paddingLeft="48dp"
-    android:paddingRight="16dp">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:id="@+id/dropdown_item_label"
+        android:id="@+id/dropdown_item_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:clickable="false"
         android:paddingRight="8dp"
         android:textSize="16sp"
-        android:clickable="false" />
+        app:layout_constraintBaseline_toBaselineOf="@id/dropdown_item_station"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/dropdown_item_guidelineStart_vertical"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/dropdown_item_data"
-        android:layout_width="wrap_content"
+        android:id="@+id/dropdown_item_station"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:clickable="false" />
+        android:clickable="false"
+        app:layout_constraintEnd_toEndOf="@id/dropdown_item_guidelineEnd_vertical"
+        app:layout_constraintStart_toEndOf="@id/dropdown_item_time"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-</LinearLayout>
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintGuide_percent="0.1"
+        android:orientation="vertical"
+        android:id="@+id/dropdown_item_guidelineStart_vertical" />
+
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintGuide_percent="0.9"
+        android:orientation="vertical"
+        android:id="@+id/dropdown_item_guidelineEnd_vertical" />
+
+</android.support.constraint.ConstraintLayout>

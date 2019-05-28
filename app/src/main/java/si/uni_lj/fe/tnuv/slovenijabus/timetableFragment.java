@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
 
@@ -37,7 +38,6 @@ public class timetableFragment extends Fragment implements DownloadCallback {
     TextView msg;
     private static final String ARG_REQUEST_STRING = "req_str";
     private String request_string;
-    ArrayList<HashMap<String, String>> timetable;
 
     public timetableFragment() {
     }
@@ -87,28 +87,9 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         }
     }
 
-    public ArrayList<HashMap<String, String>> timetableParserAll(String input) {
+    public HashMap<String, Object> timetableParser(String input) {
         String[] splitted = input.split("\n");
-        ArrayList<HashMap<String, String>> output = new ArrayList<>();
-
-        for (String s : splitted) {
-            String[] separated = s.split("\\|");
-            HashMap<String, String> timetable = new HashMap<>();
-            timetable.put("entry_time", separated[6].substring(11, 16).replaceFirst("^0+(?!$)", ""));
-            timetable.put("exit_time", separated[7].substring(11, 16).replaceFirst("^0+(?!$)", ""));
-            timetable.put("entry_time_long", separated[6]);
-            timetable.put("exit_time_long", separated[7]);
-            timetable.put("duration", separated[8]);
-            timetable.put("price", separated[9]);
-            timetable.put("line_data", separated[13]);
-            output.add(timetable);
-        }
-        return output;
-    }
-
-    public ArrayList<HashMap<String, String>> timetableParserCurrent(String input) {
-        String[] splitted = input.split("\n");
-        ArrayList<HashMap<String, String>> output = new ArrayList<>();
+        ArrayList<HashMap<String, String>> outputTimetable = new ArrayList<>();
         boolean first = true;
         int first_index = 0;
         for (int i = 0; i < splitted.length; i++) {
@@ -130,10 +111,10 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                 timetable.put("entry_time_long", separated[6]);
                 timetable.put("exit_time_long", separated[7]);
                 timetable.put("duration", separated[8]);
-                timetable.put("price", separated[9]);
+                timetable.put("price", separated[9].replace(".", ",") + " €");
                 timetable.put("line_data", separated[13]);
                 timetable.put("expired", "True");
-                output.add(timetable);
+                outputTimetable.add(timetable);
             } else {
                 HashMap<String, String> timetable = new HashMap<>();
                 timetable.put("entry_time", separated[6].substring(11, 16).replaceFirst("^0+(?!$)", ""));
@@ -141,21 +122,21 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                 timetable.put("entry_time_long", separated[6]);
                 timetable.put("exit_time_long", separated[7]);
                 timetable.put("duration", separated[8]);
-                timetable.put("price", separated[9]);
+                timetable.put("price", separated[9].replace(".", ",") + " €");
                 timetable.put("line_data", separated[13]);
                 timetable.put("expired", "False");
-                output.add(timetable);
+                outputTimetable.add(timetable);
             }
         }
         if (first) {
-            first_index = output.size();
+            first_index = outputTimetable.size();
         }
-        HashMap<String, String> index = new HashMap<>();
-        index.put("first_index", Integer.toString(first_index));
-        output.add(index);
+
+        HashMap<String, Object> output = new HashMap<>();
+        output.put("timetable", outputTimetable);
+        output.put("index", first_index);
         return output;
     }
-
 
     @Override
     public void updateFromDownload(Object res) {
@@ -166,56 +147,62 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         if (request.get("url").equals(API_voznired)) {
 
             if (result_string.equals("error")) {
-                //Toast.makeText(getActivity().getApplicationContext(), R.string.network_error_message, Toast.LENGTH_LONG).show();
                 msg.setText(R.string.network_error_message);
                 msg.setVisibility(View.VISIBLE);
                 return;
             }
 
             if (result_string.length() < 2) {
-                //Toast.makeText(getActivity().getApplicationContext(), getString(R.string.no_buses_message), Toast.LENGTH_LONG).show();
                 msg.setText(R.string.no_buses_message);
                 msg.setVisibility(View.VISIBLE);
                 return;
             }
 
-            timetable = timetableParserCurrent(result_string);
-            int first_index = Integer.parseInt(timetable.get(timetable.size() - 1).get("first_index"));
-            timetable.remove(timetable.size() - 1);
-
-            /*if (timetable.size()-1 == first_index) {
-                Toast.makeText(getActivity().getApplicationContext(), R.string.no_buses_left_on_this_day, Toast.LENGTH_LONG).show();
-            }*/
+            HashMap<String, Object> data = timetableParser(result_string);
+            int first_index = (int) data.get("index");
+            ArrayList<HashMap<String, String>> timetable = (ArrayList<HashMap<String, String>>) data.get("timetable");
 
             lv.setVisibility(View.VISIBLE);
 
-            listOfChildGroups = new ArrayList<List<HashMap<String, String>>>();
+            listOfChildGroups = new ArrayList<>();
             for (int i = 0; i < timetable.size(); i++) {
                 listOfChildGroups.add(i, new ArrayList<HashMap<String, String>>());
             }
 
-            String[] parentFromArray = {"entry_time", "exit_time", "duration"};
-            int[] parentToArray = {R.id.entry_time, R.id.exit_time, R.id.duration};
+            String[] parentFromArray = {"entry_time", "exit_time", "duration", "price"};
+            int[] parentToArray = {R.id.entry_time, R.id.exit_time, R.id.duration, R.id.price};
 
-            String[] childFromArray = {"label", "data"};
-            int[] childToArray = {R.id.dropdown_item_label, R.id.dropdown_item_data};
+            String[] childFromArray = {"time", "station"};
+            int[] childToArray = {R.id.dropdown_item_time, R.id.dropdown_item_station};
+
+            String[] firstChildFromArry = {"company", "line"};
+            int[] firstChildToArray = {R.id.dropdown_item_company, R.id.dropdown_item_line};
 
 
             adapter = new CustomExpandableListAdapter(getActivity().getApplicationContext(),
                     timetable, R.layout.show_all_list_item, parentFromArray, parentToArray,
-                    listOfChildGroups, R.layout.dropdown_list_item, childFromArray, childToArray, first_index);
+                    listOfChildGroups, R.layout.dropdown_list_item, R.layout.dropdown_list_first_item,
+                    childFromArray, childToArray, firstChildFromArry, firstChildToArray, first_index);
             lv.setAdapter(adapter);
-            lv.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            lv.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
                 @Override
-                public void onGroupExpand(int groupPosition) {
+                public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                     if (alreadyDownloadedLines.contains(groupPosition)) {
-                        lv.setSelectedGroup(groupPosition);
-                        lv.smoothScrollToPosition(groupPosition);
-                        return;
+                        return false;
                     }
                     HashMap<String, String> group = (HashMap<String, String>) adapter.getGroup(groupPosition);
                     String req_data = group.get("line_data");
-                    getLineDataFromAPI(req_data, groupPosition);
+                    try {
+                        ArrayList<HashMap<String, String>> line_data = getLineDataFromAPI2(req_data);
+                        List childGroup = listOfChildGroups.get(groupPosition);
+                        for (HashMap<String, String> hm : line_data) {
+                            childGroup.add(hm);
+                        }
+                        alreadyDownloadedLines.add(groupPosition);
+                        return false;
+                    } catch (Exception e) {
+                        return true;
+                    }
                 }
             });
             lv.setSelectedGroup(first_index);
@@ -223,42 +210,21 @@ public class timetableFragment extends Fragment implements DownloadCallback {
             Log.d("first_index", Integer.toString(first_index));
         }
 
-        if (request.get("url").equals(API_podatki_relacija)) {
+        if (request.get("url").equals(API_podatki_relacija) && false) { // trenutno disablan
             int groupPosition = Integer.parseInt(request.get("group"));
             if (result_string.equals("error")) {
                 Toast.makeText(getActivity().getApplicationContext(), R.string.network_error_message, Toast.LENGTH_LONG).show();
-                //lv.collapseGroup(groupPosition);
                 return;
             }
 
-            HashMap<String, Object> line_data = lineDataParser(result_string);
             List childGroup = listOfChildGroups.get(groupPosition);
-
-            HashMap<String, String> prevoznikmap = new HashMap<>();
-            prevoznikmap.put("label", getString(R.string.prevoznik) + ":");
-            prevoznikmap.put("data", (String) line_data.get("company"));
-            childGroup.add(prevoznikmap);
-
-            HashMap<String, String> relacijamap = new HashMap<>();
-            relacijamap.put("label", getString(R.string.relacija) + ":");
-            relacijamap.put("data", (String) line_data.get("start_end"));
-            childGroup.add(relacijamap);
-
-            for (HashMap<String, String> s :
-                    (ArrayList<HashMap<String, String>>) line_data.get("visited_stations")) {
-                HashMap<String, String> postaja = new HashMap<>();
-                postaja.put("label", s.get("time"));
-                if (s.containsKey("wait")) {
-                    postaja.put("data", s.get("station") + " (" + s.get("wait") + ")");
-                } else {
-                    postaja.put("data", s.get("station"));
-                }
-                childGroup.add(postaja);
+            ArrayList<HashMap<String, String>> line_data = lineDataParser2(result_string);
+            for (HashMap<String, String> hm : line_data) {
+                childGroup.add(hm);
             }
-            alreadyDownloadedLines.add(groupPosition);
+
             adapter.notifyDataSetChanged();
-            lv.setSelectedGroup(groupPosition);
-            lv.smoothScrollToPosition(groupPosition);
+            alreadyDownloadedLines.add(groupPosition);
         }
     }
 
@@ -324,6 +290,53 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         return output;
     }
 
+    public ArrayList<HashMap<String, String>> lineDataParser2(String input) {
+        String[] splitted = input.split("\n");
+
+        ArrayList<HashMap<String, String>> output = new ArrayList<>();
+
+        String start = splitted[0].split("\\|")[1];
+        String destination = splitted[splitted.length - 1].split("\\|")[1];
+        String startEnd = start + " - " + destination;
+        String company = splitted[0].split("\\|")[0];
+
+        HashMap<String, String> first_item = new HashMap<>();
+        first_item.put("company", company);
+        first_item.put("line", startEnd);
+        first_item.put("start", start);
+        first_item.put("destination", destination);
+
+        output.add(first_item);
+
+        for (int i = 1; i < splitted.length - 1; i++) {
+            if (i == 1) {
+                String[] s = splitted[i].split("\\|");
+                s = Arrays.copyOfRange(s, 1, s.length);
+                s[1] = s[1].substring(11, 16);
+                HashMap<String, String> ss = new HashMap<>();
+                ss.put("time", s[1]);
+                if (s.length > 3) {
+                    ss.put("station", s[0] + " (" + s[3] + ")");
+                } else {
+                    ss.put("station", s[0]);
+                }
+                output.add(ss);
+                continue;
+            }
+            String[] s = splitted[i].split("\\|");
+            s[2] = s[2].substring(11, 16);
+            HashMap<String, String> ss = new HashMap<>();
+            ss.put("time", s[2]);
+            if (s.length > 4) {
+                ss.put("station", s[1] + " (" + s[4] + ")");
+            } else {
+                ss.put("station", s[1]);
+            }
+            output.add(ss);
+        }
+        return output;
+    }
+
     public void getLineDataFromAPI(String data, int i) {
         HashMap<String, String> request = new HashMap<>();
         request.put("url", API_podatki_relacija);
@@ -331,5 +344,41 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         request.put("data", "flags=" + data);
         request.put("group", Integer.toString(i));
         makeHttpRequest(request);
+    }
+
+    public ArrayList<HashMap<String, String>> getLineDataFromAPI2(String data) {
+        HashMap<String, String> request = new HashMap<>();
+        request.put("url", API_podatki_relacija);
+        request.put("method", "POST");
+        request.put("data", "flags=" + data);
+        HashMap<String, Object> result = makeHttpRequest2(request);
+        String result_string = (String) result.get("response");
+        int response_code = (int) result.get("response_code");
+
+        if (result_string.equals("error") || response_code != 200) {
+            Toast.makeText(getActivity().getApplicationContext(), R.string.network_error_message, Toast.LENGTH_LONG).show();
+            return null;
+        }
+        ArrayList<HashMap<String, String>> line_data = lineDataParser2(result_string);
+        return line_data;
+    }
+
+    public HashMap<String, Object> makeHttpRequest2(HashMap<String, String> request) {
+        NetworkInfo netInfo = getActiveNetworkInfo();
+        HashMap<String, Object> result;
+        if (netInfo != null && netInfo.isConnected()) {
+            try {
+                Object res = new DownloadAsyncTask(this).execute(request).get(1500, TimeUnit.MILLISECONDS);
+                result = (HashMap<String, Object>) res;
+                return result;
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            Toast.makeText(getActivity().getApplicationContext(), R.string.network_error_message, Toast.LENGTH_SHORT).show();
+            result = new HashMap<>();
+            result.put("response", "error");
+            return result;
+        }
     }
 }

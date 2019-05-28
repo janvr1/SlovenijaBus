@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.HashMap;
 
 public class DownloadAsyncTask extends AsyncTask<HashMap<String, String>, Void, HashMap<String, Object>> {
+
     private static final String DEBUG_TAG = DownloadAsyncTask.class.getSimpleName();
 
     private DownloadCallback caller;
@@ -50,8 +51,8 @@ public class DownloadAsyncTask extends AsyncTask<HashMap<String, String>, Void, 
         try {
             URL url = new URL(input.get("url"));
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(15000 /* milliseconds */);
+            conn.setReadTimeout(5000 /* milliseconds */);
+            conn.setConnectTimeout(5000 /* milliseconds */);
             conn.setRequestMethod(input.get("method"));
             conn.setDoInput(true);
             if (input.get("method").equals("POST")) {
@@ -73,6 +74,7 @@ public class DownloadAsyncTask extends AsyncTask<HashMap<String, String>, Void, 
             HashMap<String, Object> result = new HashMap();
             result.put("response", contentAsString);
             result.put("request", input);
+            result.put("response_code", response);
 
             return result;
 

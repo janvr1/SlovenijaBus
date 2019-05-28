@@ -23,9 +23,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListView;
-import android.widget.LinearLayout;
-import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -46,185 +43,49 @@ import java.util.Map;
  */
 public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     private List<? extends Map<String, ?>> mGroupData;
-    private int mExpandedGroupLayout;
-    private int mCollapsedGroupLayout;
+    private int mGroupLayout;
     private String[] mGroupFrom;
     private int[] mGroupTo;
 
     private List<? extends List<? extends Map<String, ?>>> mChildData;
     private int mChildLayout;
-    private int mLastChildLayout;
+    private int mFirstChildLayout;
     private String[] mChildFrom;
     private int[] mChildTo;
+    private String[] mFirstChildFrom;
+    private int[] mFirstChildTo;
 
     private int mIndex;
-    private Context mContext;
     private int expired_color;
     private int defaultChildTextColor;
     private List<Integer> defaultGroupTextColors;
 
     private LayoutInflater mInflater;
 
-    /**
-     * Constructor
-     *
-     * @param context     The context where the {@link ExpandableListView}
-     *                    associated with this {@link SimpleExpandableListAdapter} is
-     *                    running
-     * @param groupData   A List of Maps. Each entry in the List corresponds to
-     *                    one group in the list. The Maps contain the data for each
-     *                    group, and should include all the entries specified in
-     *                    "groupFrom"
-     * @param groupFrom   A list of keys that will be fetched from the Map
-     *                    associated with each group.
-     * @param groupTo     The group views that should display column in the
-     *                    "groupFrom" parameter. These should all be TextViews. The
-     *                    first N views in this list are given the values of the first N
-     *                    columns in the groupFrom parameter.
-     * @param groupLayout resource identifier of a view layout that defines the
-     *                    views for a group. The layout file should include at least
-     *                    those named views defined in "groupTo"
-     * @param childData   A List of List of Maps. Each entry in the outer List
-     *                    corresponds to a group (index by group position), each entry
-     *                    in the inner List corresponds to a child within the group
-     *                    (index by child position), and the Map corresponds to the data
-     *                    for a child (index by values in the childFrom array). The Map
-     *                    contains the data for each child, and should include all the
-     *                    entries specified in "childFrom"
-     * @param childFrom   A list of keys that will be fetched from the Map
-     *                    associated with each child.
-     * @param childTo     The child views that should display column in the
-     *                    "childFrom" parameter. These should all be TextViews. The
-     *                    first N views in this list are given the values of the first N
-     *                    columns in the childFrom parameter.
-     * @param childLayout resource identifier of a view layout that defines the
-     *                    views for a child. The layout file should include at least
-     *                    those named views defined in "childTo"
-     */
     public CustomExpandableListAdapter(Context context,
                                        List<? extends Map<String, ?>> groupData, int groupLayout,
                                        String[] groupFrom, int[] groupTo,
                                        List<? extends List<? extends Map<String, ?>>> childData,
-                                       int childLayout, String[] childFrom, int[] childTo, int index) {
-        this(context, groupData, groupLayout, groupLayout, groupFrom, groupTo, childData,
-                childLayout, childLayout, childFrom, childTo);
-        mContext = context;
-        mIndex = index;
-        expired_color = mContext.getColor(R.color.expiredColor);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param context              The context where the {@link ExpandableListView}
-     *                             associated with this {@link SimpleExpandableListAdapter} is
-     *                             running
-     * @param groupData            A List of Maps. Each entry in the List corresponds to
-     *                             one group in the list. The Maps contain the data for each
-     *                             group, and should include all the entries specified in
-     *                             "groupFrom"
-     * @param groupFrom            A list of keys that will be fetched from the Map
-     *                             associated with each group.
-     * @param groupTo              The group views that should display column in the
-     *                             "groupFrom" parameter. These should all be TextViews. The
-     *                             first N views in this list are given the values of the first N
-     *                             columns in the groupFrom parameter.
-     * @param expandedGroupLayout  resource identifier of a view layout that
-     *                             defines the views for an expanded group. The layout file
-     *                             should include at least those named views defined in "groupTo"
-     * @param collapsedGroupLayout resource identifier of a view layout that
-     *                             defines the views for a collapsed group. The layout file
-     *                             should include at least those named views defined in "groupTo"
-     * @param childData            A List of List of Maps. Each entry in the outer List
-     *                             corresponds to a group (index by group position), each entry
-     *                             in the inner List corresponds to a child within the group
-     *                             (index by child position), and the Map corresponds to the data
-     *                             for a child (index by values in the childFrom array). The Map
-     *                             contains the data for each child, and should include all the
-     *                             entries specified in "childFrom"
-     * @param childFrom            A list of keys that will be fetched from the Map
-     *                             associated with each child.
-     * @param childTo              The child views that should display column in the
-     *                             "childFrom" parameter. These should all be TextViews. The
-     *                             first N views in this list are given the values of the first N
-     *                             columns in the childFrom parameter.
-     * @param childLayout          resource identifier of a view layout that defines the
-     *                             views for a child. The layout file should include at least
-     *                             those named views defined in "childTo"
-     */
-    public CustomExpandableListAdapter(Context context,
-                                       List<? extends Map<String, ?>> groupData, int expandedGroupLayout,
-                                       int collapsedGroupLayout, String[] groupFrom, int[] groupTo,
-                                       List<? extends List<? extends Map<String, ?>>> childData,
-                                       int childLayout, String[] childFrom, int[] childTo) {
-        this(context, groupData, expandedGroupLayout, collapsedGroupLayout,
-                groupFrom, groupTo, childData, childLayout, childLayout,
-                childFrom, childTo);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param context              The context where the {@link ExpandableListView}
-     *                             associated with this {@link SimpleExpandableListAdapter} is
-     *                             running
-     * @param groupData            A List of Maps. Each entry in the List corresponds to
-     *                             one group in the list. The Maps contain the data for each
-     *                             group, and should include all the entries specified in
-     *                             "groupFrom"
-     * @param groupFrom            A list of keys that will be fetched from the Map
-     *                             associated with each group.
-     * @param groupTo              The group views that should display column in the
-     *                             "groupFrom" parameter. These should all be TextViews. The
-     *                             first N views in this list are given the values of the first N
-     *                             columns in the groupFrom parameter.
-     * @param expandedGroupLayout  resource identifier of a view layout that
-     *                             defines the views for an expanded group. The layout file
-     *                             should include at least those named views defined in "groupTo"
-     * @param collapsedGroupLayout resource identifier of a view layout that
-     *                             defines the views for a collapsed group. The layout file
-     *                             should include at least those named views defined in "groupTo"
-     * @param childData            A List of List of Maps. Each entry in the outer List
-     *                             corresponds to a group (index by group position), each entry
-     *                             in the inner List corresponds to a child within the group
-     *                             (index by child position), and the Map corresponds to the data
-     *                             for a child (index by values in the childFrom array). The Map
-     *                             contains the data for each child, and should include all the
-     *                             entries specified in "childFrom"
-     * @param childFrom            A list of keys that will be fetched from the Map
-     *                             associated with each child.
-     * @param childTo              The child views that should display column in the
-     *                             "childFrom" parameter. These should all be TextViews. The
-     *                             first N views in this list are given the values of the first N
-     *                             columns in the childFrom parameter.
-     * @param childLayout          resource identifier of a view layout that defines the
-     *                             views for a child (unless it is the last child within a group,
-     *                             in which case the lastChildLayout is used). The layout file
-     *                             should include at least those named views defined in "childTo"
-     * @param lastChildLayout      resource identifier of a view layout that defines
-     *                             the views for the last child within each group. The layout
-     *                             file should include at least those named views defined in
-     *                             "childTo"
-     */
-    public CustomExpandableListAdapter(Context context,
-                                       List<? extends Map<String, ?>> groupData, int expandedGroupLayout,
-                                       int collapsedGroupLayout, String[] groupFrom, int[] groupTo,
-                                       List<? extends List<? extends Map<String, ?>>> childData,
-                                       int childLayout, int lastChildLayout, String[] childFrom,
-                                       int[] childTo) {
+                                       int childLayout, int firstChildLayout, String[] childFrom,
+                                       int[] childTo, String[] firstChildFrom, int[] firstChildTo, int index) {
         mGroupData = groupData;
-        mExpandedGroupLayout = expandedGroupLayout;
-        mCollapsedGroupLayout = collapsedGroupLayout;
+        mGroupLayout = groupLayout;
         mGroupFrom = groupFrom;
         mGroupTo = groupTo;
 
         mChildData = childData;
         mChildLayout = childLayout;
-        mLastChildLayout = lastChildLayout;
+        mFirstChildLayout = firstChildLayout;
         mChildFrom = childFrom;
         mChildTo = childTo;
+        mFirstChildFrom = firstChildFrom;
+        mFirstChildTo = firstChildTo;
 
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        Context mContext = context;
+        mIndex = index;
+        expired_color = mContext.getResources().getColor(R.color.expiredColor);
     }
 
     public Object getChild(int groupPosition, int childPosition) {
@@ -237,24 +98,36 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
-        LinearLayout ll;
-        if (convertView == null) {
-            ll = (LinearLayout) newChildView(isLastChild, parent);
-            defaultChildTextColor = ((TextView) ll.getChildAt(0)).getCurrentTextColor();
-            if (groupPosition < mIndex) {
-                setAllTextColor(ll, expired_color);
-            }
+
+        ConstraintLayout cl;
+        boolean firstChild;
+        if (childPosition == 0) {
+            firstChild = true;
         } else {
-            ll = (LinearLayout) convertView;
-            if (groupPosition < mIndex) {
-                setAllTextColor(ll, expired_color);
-            } else {
-                setAllTextColor(ll, defaultChildTextColor);
-            }
+            firstChild = false;
+        }
+        cl = (ConstraintLayout) newChildView(firstChild, parent);
+        defaultChildTextColor = ((TextView) cl.getChildAt(0)).getCurrentTextColor();
+        if (groupPosition < mIndex) {
+            setAllTextColor(cl, expired_color);
+        } else {
+            setAllTextColor(cl, defaultChildTextColor);
         }
 
-        bindView(ll, mChildData.get(groupPosition).get(childPosition), mChildFrom, mChildTo);
-        return ll;
+/*        } else {
+            cl = (ConstraintLayout) convertView;
+            if (groupPosition < mIndex) {
+                setAllTextColor(cl, expired_color);
+            } else {
+                setAllTextColor(cl, defaultChildTextColor);
+            }*/
+        if (firstChild) {
+            bindView(cl, mChildData.get(groupPosition).get(childPosition), mFirstChildFrom, mFirstChildTo);
+        } else {
+            bindView(cl, mChildData.get(groupPosition).get(childPosition), mChildFrom, mChildTo);
+        }
+
+        return cl;
     }
 
     /**
@@ -264,8 +137,8 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
      * @param parent      The eventual parent of this new View.
      * @return A new child View
      */
-    public View newChildView(boolean isLastChild, ViewGroup parent) {
-        return mInflater.inflate((isLastChild) ? mLastChildLayout : mChildLayout, parent, false);
+    public View newChildView(boolean isFirstChild, ViewGroup parent) {
+        return mInflater.inflate((isFirstChild) ? mFirstChildLayout : mChildLayout, parent, false);
     }
 
     private void bindView(View view, Map<String, ?> data, String[] from, int[] to) {
@@ -327,8 +200,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
      * @return A new group View
      */
     public View newGroupView(boolean isExpanded, ViewGroup parent) {
-        return mInflater.inflate((isExpanded) ? mExpandedGroupLayout : mCollapsedGroupLayout,
-                parent, false);
+        return mInflater.inflate(mGroupLayout, parent, false);
     }
 
     public boolean isChildSelectable(int groupPosition, int childPosition) {
@@ -339,7 +211,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    public void setAllTextColor(ViewGroup vg, int color) {
+    private void setAllTextColor(ViewGroup vg, int color) {
         int child_num = vg.getChildCount();
         for (int i = 0; i < child_num; i++) {
             try {
@@ -350,7 +222,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         }
     }
 
-    public List<Integer> getTextColors(ViewGroup vg) {
+    private List<Integer> getTextColors(ViewGroup vg) {
         int child_num = vg.getChildCount();
         List<Integer> colors = new ArrayList<>();
         for (int i = 0; i < child_num; i++) {
@@ -363,7 +235,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         return colors;
     }
 
-    public void setTextColors(ViewGroup vg, List<Integer> clrs) {
+    private void setTextColors(ViewGroup vg, List<Integer> clrs) {
         int child_num = vg.getChildCount();
         for (int i = 0, j = 0; i < child_num; i++) {
             View v = vg.getChildAt(i);

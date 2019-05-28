@@ -4,5 +4,8 @@
     <!--#01579C-->
     <color name="colorPrimaryDark">#033688</color>
     <color name="colorAccent">#FFAE00</color>
-    <color name="expiredColor">#BBBBBB</color>
+    <color name="bgColor">#FAFAFA</color>
+    <color name="expiredColor">#DDDDDD</color>
+    <color name="timeTableTextColor">#323232</color>
+    <color name="primary_text_default_material_light">#de000000</color>
 </resources>
