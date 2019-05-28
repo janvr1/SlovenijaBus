@@ -85,7 +85,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
         Context mContext = context;
         mIndex = index;
-        expired_color = mContext.getResources().getColor(R.color.expiredColor);
+        expired_color = mContext.getColor(R.color.expiredColor);
     }
 
     public Object getChild(int groupPosition, int childPosition) {

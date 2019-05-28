@@ -4,5 +4,5 @@
 * Dizajn
 * Tretji screen
 * Favorites shranit v DB namesto sharedPreferences
-* Zgodovina iskanja? (isto DB)
+* Zadnja poizvedba view
 * Prenos voznih redov za offline pregled

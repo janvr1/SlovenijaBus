@@ -28,6 +28,8 @@ import java.util.Set;
 
 public class showAllActivity extends AppCompatActivity {
 
+    DatabaseHelper favorites_db;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +41,7 @@ public class showAllActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= 21) {
             getWindow().setStatusBarColor(getColor(R.color.colorPrimaryDark));
         }
+        favorites_db = DatabaseHelper.getInstance(this);
 
         Intent intent = getIntent();
         String date = intent.getStringExtra(MainActivity.EXTRA_DATE);
@@ -92,23 +95,42 @@ public class showAllActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        if (checkIfInFavorites(readFavorites(), entryStationID, exitStationID) > -1) {
+/*        if (checkIfInFavorites(readFavorites(), entryStationID, exitStationID) > -1) {
+            ImageButton fav_btn = findViewById(R.id.favorite_button);
+            fav_btn.setImageResource(R.drawable.heart_full_white);
+        }*/
+        Log.d("showAllActivity", entryName + " " + exitName);
+        if (favorites_db.checkIfIn(entryName, exitName)) {
             ImageButton fav_btn = findViewById(R.id.favorite_button);
             fav_btn.setImageResource(R.drawable.heart_full_white);
         }
     }
 
     public void favoritesButton(View view) {
-        ArrayList<HashMap<String, String>> favorites = readFavorites();
+        //ArrayList<HashMap<String, String>> favorites = readFavorites();
 
         Intent intent = getIntent();
         String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
         String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
-        int index = checkIfInFavorites(favorites, entryStationID, exitStationID);
+        String entryName = MainActivity.stations_map.get(entryStationID);
+        String exitName = MainActivity.stations_map.get(exitStationID);
+        //int index = checkIfInFavorites(favorites, entryStationID, exitStationID);
+        boolean isIn = favorites_db.checkIfIn(entryName, exitName);
 
         ImageButton fav_btn = findViewById(R.id.favorite_button);
 
-        if (index == -1) { //dodamo
+        if (isIn) {
+            favorites_db.removeFavorite(entryName, exitName);
+            fav_btn.setImageResource(R.drawable.heart_empty_white);
+            Toast.makeText(this, getString(R.string.remove_from_favorites), Toast.LENGTH_LONG).show();
+        } else {
+            favorites_db.addFavorite(entryName, exitName);
+            fav_btn.setImageResource(R.drawable.heart_full_white);
+            Toast.makeText(this, getString(R.string.add_to_favorites), Toast.LENGTH_LONG).show();
+        }
+        dumpDBtoLog();
+
+/*        if (index == -1) { //dodamo
             HashMap<String, String> newMap = new HashMap<>();
             newMap.put("from", MainActivity.stations_map.get(entryStationID));
             newMap.put("to", MainActivity.stations_map.get(exitStationID));
@@ -122,7 +144,8 @@ public class showAllActivity extends AppCompatActivity {
             writeFavorites(favorites);
             fav_btn.setImageResource(R.drawable.heart_empty_white);
             Toast.makeText(this, getString(R.string.remove_from_favorites), Toast.LENGTH_LONG).show();
-        }
+        }*/
+
     }
 
     public int checkIfInFavorites(ArrayList<HashMap<String, String>> favorites,
@@ -182,5 +205,11 @@ public class showAllActivity extends AppCompatActivity {
         newIntent.putExtra(MainActivity.EXTRA_DATE, date);
         startActivity(newIntent);
         finish();
+    }
+
+    public void dumpDBtoLog() {
+        for (HashMap<String, String> hm : favorites_db.readFavorites()) {
+            Log.d("db", hm.toString());
+        }
     }
 }

@@ -1,20 +1,19 @@
 package si.uni_lj.fe.tnuv.slovenijabus;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -46,11 +45,17 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     public static Map<String, String> stations_map = new HashMap<>();
 
     SimpleAdapter favorites_adapter;
+    final ArrayList<HashMap<String, String>> favorites = new ArrayList<>();
+
+    DatabaseHelper favorites_db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getStationsFromAPI();
+        favorites_db = DatabaseHelper.getInstance(this);
 
         Calendar calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
@@ -64,22 +69,15 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         entryView = findViewById(R.id.vstopna_vnos);
         exitView = findViewById(R.id.izstopna_vnos);
 
-        getStationsFromAPI();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        final ArrayList<HashMap<String, String>> favorites = readFavorites();
         ListView fav_lv = findViewById(R.id.favorites_listview);
 
-        String[] fromArray = {"from", "to"};
+        favorites.addAll(favorites_db.readFavorites());
+        String[] fromArray = {"entry", "exit"};
         int[] toArray = {R.id.favorites_from, R.id.favorites_to};
-
 
         favorites_adapter = new SimpleAdapter(this, favorites, R.layout.favorites_list_item,
                 fromArray, toArray);
+
         fav_lv.setAdapter(favorites_adapter);
 
         fav_lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -87,9 +85,14 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                                            int position, long id) {
+                TextView from = view.findViewById(R.id.favorites_from);
+                String entry = from.getText().toString();
+                TextView to = view.findViewById(R.id.favorites_to);
+                String exit = to.getText().toString();
                 favorites.remove(position);
                 favorites_adapter.notifyDataSetChanged();
-                writeFavorites(favorites);
+                favorites_db.removeFavorite(entry, exit);
+                dumpDBtoLog();
                 Toast.makeText(MainActivity.this, R.string.remove_from_favorites, Toast.LENGTH_LONG).show();
                 return true;
             }
@@ -99,8 +102,8 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 HashMap<String, String> clicked = favorites.get(position);
-                String entryID = stations_map.get(clicked.get("from"));
-                String exitID = stations_map.get(clicked.get("to"));
+                String entryID = stations_map.get(clicked.get("entry"));
+                String exitID = stations_map.get(clicked.get("exit"));
 
                 Intent intent = new Intent(getApplicationContext(), showAllActivity.class);
 
@@ -108,37 +111,28 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 intent.putExtra(EXTRA_EXIT, exitID);
                 intent.putExtra(EXTRA_DATE, dateView.getText().toString());
                 startActivity(intent);
-
             }
         });
     }
 
-    public void setDate(View view) {
-        showDialog(999);
-    }
-
     @Override
-    protected Dialog onCreateDialog(int id) {
-        if (id == 999) {
-            return new DatePickerDialog(this, myDateListener, year, month, day);
-        }
-        return null;
+    protected void onStart() {
+        super.onStart();
+        favorites.clear();
+        favorites.addAll(favorites_db.readFavorites());
+        favorites_adapter.notifyDataSetChanged();
+        dumpDBtoLog();
     }
 
-    private DatePickerDialog.OnDateSetListener myDateListener = new DatePickerDialog
-            .OnDateSetListener() {
-        @Override
-        public void onDateSet(DatePicker arg0, int year, int month, int day) {
-            dateView.setText(dateStringBuilder(year, month, day));
-
-        }
-    };
+    public void setDate(View view) {
+        DialogFragment df = new SetDateFragment();
+        df.show(getSupportFragmentManager(), "date_entry");
+    }
 
     private String dateStringBuilder(int year, int month, int day) {
         month++; // da je pravilen mesec :)
         return day + "." + month + "." + year;
     }
-
 
     public void launchShowAll(View view) {
         String entryStation = entryView.getText().toString();
@@ -223,6 +217,11 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         editor.apply();
     }
 
+    public void dumpDBtoLog() {
+        for (HashMap<String, String> hm : favorites_db.readFavorites()) {
+            Log.d("db", hm.toString());
+        }
+    }
 
     @Override
     public void updateFromDownload(Object res) {
