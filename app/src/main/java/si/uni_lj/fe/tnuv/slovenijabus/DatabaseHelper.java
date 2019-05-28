@@ -18,7 +18,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_NAME_STATIONS = "stations";
     private static int DB_VERSION = 1;
 
-
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
@@ -65,6 +64,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void removeFavoriteFromIndex(int index) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME_FAVORITES, null, null, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            cursor.moveToPosition(index);
+            String rowID = cursor.getString(cursor.getColumnIndex("id"));
+            db.delete(TABLE_NAME_FAVORITES, "id=?", new String[]{rowID});
+        }
+    }
+
     public ArrayList<HashMap<String, String>> readFavorites() {
         ArrayList<HashMap<String, String>> favorites = new ArrayList<>();
 
@@ -86,6 +95,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean checkIfIn(String entry, String exit) {
+        if (entry == null || exit == null) {
+            return false;
+        }
         SQLiteDatabase db = this.getReadableDatabase();
         boolean isIn;
         String query = "SELECT * FROM " + TABLE_NAME_FAVORITES + " WHERE entry=? AND exit=?";
@@ -147,6 +159,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String getStationNameFromID(String id) {
+        if (id == null) {
+            return null;
+        }
+
         SQLiteDatabase db = this.getReadableDatabase();
         String output;
         String query = "SELECT * FROM " + TABLE_NAME_STATIONS + " WHERE station_id=?";
@@ -162,6 +178,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String getStationIDFromName(String name) {
+        if (name == null) {
+            return null;
+        }
         SQLiteDatabase db = this.getReadableDatabase();
         String output;
         String query = "SELECT * FROM " + TABLE_NAME_STATIONS + " WHERE station_name=?";
@@ -201,5 +220,4 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return cursorString;
     }
-
 }

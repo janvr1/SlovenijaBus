@@ -99,7 +99,8 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 String exit = to.getText().toString();
                 favorites.remove(position);
                 favorites_adapter.notifyDataSetChanged();
-                slovenijabus_DB.removeFavorite(entry, exit);
+                //slovenijabus_DB.removeFavorite(entry, exit);
+                slovenijabus_DB.removeFavoriteFromIndex(position);
                 Toast.makeText(MainActivity.this, R.string.remove_from_favorites, Toast.LENGTH_LONG).show();
                 return true;
             }

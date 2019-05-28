@@ -58,9 +58,9 @@ public class showAllActivity extends AppCompatActivity {
             Calendar c = Calendar.getInstance();
             c.setTime(date1);
             c.add(Calendar.DAY_OF_MONTH, 1);
-            date2 = sdf.format(c.getTime());
+            date2 = dateStringBuilder(c.get(c.YEAR), c.get(c.MONTH), c.get(c.DAY_OF_MONTH));
             c.add(Calendar.DAY_OF_MONTH, 1);
-            date3 = sdf.format(c.getTime());
+            date3 = dateStringBuilder(c.get(c.YEAR), c.get(c.MONTH), c.get(c.DAY_OF_MONTH));
         } catch (Exception e) {
             Log.d("parse exception", "something no worky worky");
         }
@@ -210,5 +210,10 @@ public class showAllActivity extends AppCompatActivity {
         for (HashMap<String, String> hm : slovenijabus_DB.readFavorites()) {
             Log.d("db", hm.toString());
         }
+    }
+
+    private String dateStringBuilder(int year, int month, int day) {
+        month++; // da je pravilen mesec :)
+        return day + "." + month + "." + year;
     }
 }
