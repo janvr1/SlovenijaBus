@@ -17,7 +17,6 @@
 package si.uni_lj.fe.tnuv.slovenijabus;
 
 import android.content.Context;
-import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -99,35 +98,28 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
 
-        ConstraintLayout cl;
+        ViewGroup vg;
         boolean firstChild;
         if (childPosition == 0) {
             firstChild = true;
         } else {
             firstChild = false;
         }
-        cl = (ConstraintLayout) newChildView(firstChild, parent);
-        defaultChildTextColor = ((TextView) cl.getChildAt(0)).getCurrentTextColor();
+        vg = (ViewGroup) newChildView(firstChild, parent);
+        //ViewGroup vg2 = (ViewGroup) vg.getChildAt(0);
+        defaultChildTextColor = ((TextView) vg.getChildAt(0)).getCurrentTextColor();
         if (groupPosition < mIndex) {
-            setAllTextColor(cl, expired_color);
+            setAllTextColor(vg, expired_color, -1);
         } else {
-            setAllTextColor(cl, defaultChildTextColor);
+            setAllTextColor(vg, defaultChildTextColor, -1);
         }
-
-/*        } else {
-            cl = (ConstraintLayout) convertView;
-            if (groupPosition < mIndex) {
-                setAllTextColor(cl, expired_color);
-            } else {
-                setAllTextColor(cl, defaultChildTextColor);
-            }*/
         if (firstChild) {
-            bindView(cl, mChildData.get(groupPosition).get(childPosition), mFirstChildFrom, mFirstChildTo);
+            bindView(vg, mChildData.get(groupPosition).get(childPosition), mFirstChildFrom, mFirstChildTo);
         } else {
-            bindView(cl, mChildData.get(groupPosition).get(childPosition), mChildFrom, mChildTo);
+            bindView(vg, mChildData.get(groupPosition).get(childPosition), mChildFrom, mChildTo);
         }
 
-        return cl;
+        return vg;
     }
 
     /**
@@ -170,26 +162,25 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {
-        View v;
-        ConstraintLayout cl;
+        ViewGroup vg;
         if (convertView == null) {
-            cl = (ConstraintLayout) newGroupView(isExpanded, parent);
-            defaultGroupTextColors = getTextColors(cl);
+            vg = (ViewGroup) newGroupView(isExpanded, parent);
+            defaultGroupTextColors = getTextColors(vg, R.id.show_all_list_item);
             if (groupPosition < mIndex) {
-                setAllTextColor(cl, expired_color);
+                setAllTextColor(vg, expired_color, R.id.show_all_list_item);
             }
         } else {
-            cl = (ConstraintLayout) convertView;
+            vg = (ViewGroup) convertView;
             if (groupPosition < mIndex) {
-                setAllTextColor(cl, expired_color);
+                setAllTextColor(vg, expired_color, R.id.show_all_list_item);
             } else {
-                setTextColors(cl, defaultGroupTextColors);
+                setTextColors(vg, defaultGroupTextColors, R.id.show_all_list_item);
             }
         }
         Log.d("adapter_group_position", Integer.toString(groupPosition));
         Log.d("adapter_index", Integer.toString(mIndex));
-        bindView(cl, mGroupData.get(groupPosition), mGroupFrom, mGroupTo);
-        return cl;
+        bindView(vg, mGroupData.get(groupPosition), mGroupFrom, mGroupTo);
+        return vg;
     }
 
     /**
@@ -211,36 +202,44 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    private void setAllTextColor(ViewGroup vg, int color) {
-        int child_num = vg.getChildCount();
+    private void setAllTextColor(ViewGroup vg, int color, int viewGroupID) {
+        ViewGroup parent;
+        if (viewGroupID == -1) {
+            parent = vg;
+        } else {
+            parent = vg.findViewById(viewGroupID);
+        }
+        int child_num = parent.getChildCount();
         for (int i = 0; i < child_num; i++) {
             try {
-                TextView tv = (TextView) vg.getChildAt(i);
+                TextView tv = (TextView) parent.getChildAt(i);
                 tv.setTextColor(color);
             } catch (Exception e) {
             }
         }
     }
 
-    private List<Integer> getTextColors(ViewGroup vg) {
-        int child_num = vg.getChildCount();
+    private List<Integer> getTextColors(ViewGroup vg, int viewGroupID) {
+        ViewGroup parent = vg.findViewById(viewGroupID);
+        int child_num = parent.getChildCount();
         List<Integer> colors = new ArrayList<>();
         for (int i = 0; i < child_num; i++) {
-            View v = vg.getChildAt(i);
+            View v = parent.getChildAt(i);
             if (v instanceof TextView) {
-                TextView tv = (TextView) vg.getChildAt(i);
+                TextView tv = (TextView) parent.getChildAt(i);
                 colors.add(tv.getCurrentTextColor());
             }
         }
         return colors;
     }
 
-    private void setTextColors(ViewGroup vg, List<Integer> clrs) {
-        int child_num = vg.getChildCount();
+    private void setTextColors(ViewGroup vg, List<Integer> clrs, int viewGroupID) {
+        ViewGroup parent = vg.findViewById(viewGroupID);
+        int child_num = parent.getChildCount();
         for (int i = 0, j = 0; i < child_num; i++) {
-            View v = vg.getChildAt(i);
+            View v = parent.getChildAt(i);
             if (v instanceof TextView) {
-                TextView tv = (TextView) vg.getChildAt(i);
+                TextView tv = (TextView) parent.getChildAt(i);
                 tv.setTextColor(clrs.get(j));
                 j++;
             }

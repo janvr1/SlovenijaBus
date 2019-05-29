@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/dropdown_list_item"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
@@ -25,7 +26,8 @@
         android:textSize="16sp"
         android:textStyle="bold"
         android:clickable="false"
-        app:layout_constraintEnd_toEndOf="@id/dropdown_item_guidelineEnd_vertical"
+        android:paddingRight="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/dropdown_item_time"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />

@@ -19,7 +19,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        android:childDivider="#00000000"
+        android:childDivider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:divider="@android:color/transparent"
         android:visibility="gone"
         android:transcriptMode="disabled" />
 
