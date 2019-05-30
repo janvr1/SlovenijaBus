@@ -9,6 +9,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -209,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
             if (request.containsKey("index")) {
                 int index = Integer.parseInt(request.get("index"));
+                Log.d("favorites_index", request.get("index"));
                 ArrayList<String> next_buses = timetableParserFavorites(result_string);
                 for (int i = 0; i < next_buses.size(); i++) {
                     if (i == 0) {
@@ -222,6 +224,11 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                     }
                 }
                 favorites_recycler_adapter.notifyItemChanged(index);
+                Log.d("favorites_array", "start");
+                for (HashMap<String, String> hm : favorites) {
+                    Log.d("favorites_array", hm.toString());
+                }
+                Log.d("favorites_array", "end");
             }
         }
     }

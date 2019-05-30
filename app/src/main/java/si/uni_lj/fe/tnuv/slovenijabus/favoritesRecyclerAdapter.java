@@ -38,14 +38,20 @@ public class favoritesRecyclerAdapter extends RecyclerView.Adapter<favoritesRecy
         if (favorite.containsKey("first")) {
             viewHolder.first.setText(favorite.get("first"));
             viewHolder.first.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.first.setVisibility(View.GONE);
         }
         if (favorite.containsKey("second")) {
             viewHolder.second.setText(favorite.get("second"));
             viewHolder.second.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.second.setVisibility(View.GONE);
         }
         if (favorite.containsKey("third")) {
             viewHolder.third.setText(favorite.get("third"));
             viewHolder.third.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.third.setVisibility(View.GONE);
         }
         viewHolder.parent.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,7 +107,8 @@ public class favoritesRecyclerAdapter extends RecyclerView.Adapter<favoritesRecy
             second = view.findViewById(R.id.second_bus);
             third = view.findViewById(R.id.third_bus);
             parent = view;
-            pos = getLayoutPosition();
+            //pos = getLayoutPosition();
+            pos = getAdapterPosition();
         }
     }
 }
