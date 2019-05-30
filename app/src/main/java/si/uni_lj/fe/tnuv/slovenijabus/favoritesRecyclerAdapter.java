@@ -107,8 +107,8 @@ public class favoritesRecyclerAdapter extends RecyclerView.Adapter<favoritesRecy
             second = view.findViewById(R.id.second_bus);
             third = view.findViewById(R.id.third_bus);
             parent = view;
-            //pos = getLayoutPosition();
-            pos = getAdapterPosition();
+            pos = getLayoutPosition();
+            //pos = getAdapterPosition();
         }
     }
 }

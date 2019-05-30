@@ -1,6 +1,6 @@
 ### Stvari za implementacijo:
 * Popravit main screen v landscape orientaciji (drugačen layout za landscape?)
-* Spremenit expandableListView v recycler view
+* Spremenit expandableListView v recyclerView
 * Animacije
 * Dizajn
 * Tretji screen

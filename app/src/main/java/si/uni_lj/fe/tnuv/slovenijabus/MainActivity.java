@@ -97,9 +97,13 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     @Override
     protected void onStart() {
         super.onStart();
-        favorites.clear();
-        favorites.addAll(slovenijabus_DB.readFavorites());
-        favorites_recycler_adapter.notifyDataSetChanged();
+        
+        ArrayList<HashMap<String, String>> new_favorites = slovenijabus_DB.readFavorites();
+        if (favoritesChanged(new_favorites, favorites)) {
+            favorites.clear();
+            favorites.addAll(slovenijabus_DB.readFavorites());
+            favorites_recycler_adapter.notifyDataSetChanged();
+        }
 
         for (int i = 0; i < favorites.size(); i++) {
             String request_data = "VSTOP_ID=" + slovenijabus_DB.getStationIDFromName(favorites.get(i).get("entry"))
@@ -212,18 +216,30 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 int index = Integer.parseInt(request.get("index"));
                 Log.d("favorites_index", request.get("index"));
                 ArrayList<String> next_buses = timetableParserFavorites(result_string);
+                boolean change = false;
                 for (int i = 0; i < next_buses.size(); i++) {
                     if (i == 0) {
+                        if (!next_buses.get(i).equals(favorites.get(index).get("first"))) {
+                            change = true;
+                        }
                         favorites.get(index).put("first", next_buses.get(i));
                     }
                     if (i == 1) {
+                        if (!next_buses.get(i).equals(favorites.get(index).get("second"))) {
+                            change = true;
+                        }
                         favorites.get(index).put("second", next_buses.get(i));
                     }
                     if (i == 2) {
+                        if (!next_buses.get(i).equals(favorites.get(index).get("third"))) {
+                            change = true;
+                        }
                         favorites.get(index).put("third", next_buses.get(i));
                     }
                 }
-                favorites_recycler_adapter.notifyItemChanged(index);
+                if (change) {
+                    favorites_recycler_adapter.notifyItemChanged(index);
+                }
                 Log.d("favorites_array", "start");
                 for (HashMap<String, String> hm : favorites) {
                     Log.d("favorites_array", hm.toString());
@@ -274,5 +290,20 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
     @Override
     public void finishDownloading() {
+    }
+
+    public boolean favoritesChanged(ArrayList<HashMap<String, String>> new_fav, ArrayList<HashMap<String, String>> old_fav) {
+        if (new_fav.size() != old_fav.size()) {
+            return true;
+        }
+        for (int i = 0; i < new_fav.size(); i++) {
+            HashMap<String, String> hm_new, hm_old;
+            hm_new = new_fav.get(i);
+            hm_old = new_fav.get(i);
+            if (!hm_new.get("entry").equals(hm_old.get("entry")) || !hm_new.get("exit").equals(hm_old.get("exit"))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
