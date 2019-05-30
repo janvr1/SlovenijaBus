@@ -85,6 +85,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         Context mContext = context;
         mIndex = index;
         expired_color = mContext.getColor(R.color.expiredColor);
+        defaultChildTextColor = mContext.getColor(android.R.color.secondary_text_light);
     }
 
     public Object getChild(int groupPosition, int childPosition) {
@@ -105,9 +106,23 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         } else {
             firstChild = false;
         }
-        vg = (ViewGroup) newChildView(firstChild, parent);
+        if (convertView == null) {
+            vg = (ViewGroup) newChildView(firstChild, parent);
+        } else {
+            vg = (ViewGroup) convertView;
+            if (firstChild) {
+                if (vg.getId() != R.id.dropdown_list_first_item) {
+                    vg = (ViewGroup) newChildView(firstChild, parent);
+                }
+
+            } else {
+                if (vg.getId() != R.id.dropdown_list_item) {
+                    vg = (ViewGroup) newChildView(firstChild, parent);
+                }
+            }
+        }
         //ViewGroup vg2 = (ViewGroup) vg.getChildAt(0);
-        defaultChildTextColor = ((TextView) vg.getChildAt(0)).getCurrentTextColor();
+        //defaultChildTextColor = ((TextView) vg.getChildAt(0)).getCurrentTextColor();
         if (groupPosition < mIndex) {
             setAllTextColor(vg, expired_color, -1);
         } else {
