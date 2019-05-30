@@ -2,28 +2,26 @@ package si.uni_lj.fe.tnuv.slovenijabus;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 @SuppressWarnings("unchecked")
 
@@ -41,6 +39,9 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     public static final String API_postaje =
             "https://www.ap-ljubljana.si/_vozni_red/get_postajalisca_vsa_v2.php"; // GET request
 
+    public static final String API_voznired =
+            "https://www.ap-ljubljana.si/_vozni_red/get_vozni_red_0.php";
+
     //public static Map<String, String> stations_map = new HashMap<>();
     public ArrayList<String> station_names = new ArrayList<>();
     SimpleAdapter favorites_adapter;
@@ -48,6 +49,11 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     final ArrayList<HashMap<String, String>> favorites = new ArrayList<>();
 
     DatabaseHelper slovenijabus_DB;
+
+    private RecyclerView.Adapter favorites_recycler_adapter;
+    private RecyclerView.LayoutManager favorites_layout_manager;
+    private RecyclerView favorites_rv;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +70,13 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         end_day = calendar.get(Calendar.DAY_OF_MONTH) + 14; // Datum za do dva tedna v naprej <—— To ne bo dobr delal, če je do konca meseca manj kot dva tedna ;)
 
         dateView = findViewById(R.id.datum_vnos);
-        dateView.setText(dateStringBuilder(year, month, day));
-
+        if (savedInstanceState != null) {
+            dateView.setText(savedInstanceState.getString("date"));
+        } else {
+            dateView.setText(dateStringBuilder(year, month, day));
+        }
         entryView = findViewById(R.id.vstopna_vnos);
         exitView = findViewById(R.id.izstopna_vnos);
-
-        ListView fav_lv = findViewById(R.id.favorites_listview);
 
         station_names.addAll(slovenijabus_DB.readStationsNames());
         adapter = new ArrayAdapter<>(this,
@@ -78,49 +85,12 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         exitView.setAdapter(adapter);
 
         favorites.addAll(slovenijabus_DB.readFavorites());
-        //Log.d("main_db", slovenijabus_DB.getStationNameFromID("1"));
-        //Log.d("main_db", slovenijabus_DB.getStationIDFromName("LJUBLJANA AVTOBUSNA POSTAJA"));
-        String[] fromArray = {"entry", "exit"};
-        int[] toArray = {R.id.favorites_from, R.id.favorites_to};
 
-        favorites_adapter = new SimpleAdapter(this, favorites, R.layout.favorites_list_item,
-                fromArray, toArray);
-
-        fav_lv.setAdapter(favorites_adapter);
-
-        fav_lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                           int position, long id) {
-                TextView from = view.findViewById(R.id.favorites_from);
-                String entry = from.getText().toString();
-                TextView to = view.findViewById(R.id.favorites_to);
-                String exit = to.getText().toString();
-                favorites.remove(position);
-                favorites_adapter.notifyDataSetChanged();
-                //slovenijabus_DB.removeFavorite(entry, exit);
-                slovenijabus_DB.removeFavoriteFromIndex(position);
-                Toast.makeText(MainActivity.this, R.string.remove_from_favorites, Toast.LENGTH_LONG).show();
-                return true;
-            }
-        });
-
-        fav_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                HashMap<String, String> clicked = favorites.get(position);
-                String entryID = slovenijabus_DB.getStationIDFromName(clicked.get("entry"));
-                String exitID = slovenijabus_DB.getStationIDFromName(clicked.get("exit"));
-
-                Intent intent = new Intent(getApplicationContext(), showAllActivity.class);
-
-                intent.putExtra(EXTRA_ENTRY, entryID);
-                intent.putExtra(EXTRA_EXIT, exitID);
-                intent.putExtra(EXTRA_DATE, dateView.getText().toString());
-                startActivity(intent);
-            }
-        });
+        favorites_recycler_adapter = new favoritesRecyclerAdapter(this, favorites, dateView);
+        favorites_rv = findViewById(R.id.favorites_recyclerview);
+        favorites_layout_manager = new LinearLayoutManager(this);
+        favorites_rv.setLayoutManager(favorites_layout_manager);
+        favorites_rv.setAdapter(favorites_recycler_adapter);
     }
 
     @Override
@@ -128,8 +98,20 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         super.onStart();
         favorites.clear();
         favorites.addAll(slovenijabus_DB.readFavorites());
-        favorites_adapter.notifyDataSetChanged();
+        favorites_recycler_adapter.notifyDataSetChanged();
 
+        for (int i = 0; i < favorites.size(); i++) {
+            String request_data = "VSTOP_ID=" + slovenijabus_DB.getStationIDFromName(favorites.get(i).get("entry"))
+                    + "&IZSTOP_ID=" + slovenijabus_DB.getStationIDFromName(favorites.get(i).get("exit")) + "&DATUM="
+                    + dateStringBuilder(year, month, day);
+            getNext3Buses(i, request_data);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("date", dateView.getText().toString());
     }
 
     public void setDate(View view) {
@@ -152,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         intent.putExtra(EXTRA_DATE, date);
         startActivity(intent);
     }
-
 
     public void makeHttpRequest(HashMap<String, String> request) {
         NetworkInfo netInfo = getActiveNetworkInfo();
@@ -195,41 +176,11 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         return station_map;
     }
 
-    public ArrayList<HashMap<String, String>> readFavorites() {
-        SharedPreferences sharedPref = getSharedPreferences(
-                getString(R.string.preferences_key), Context.MODE_PRIVATE);
-
-        Set<String> fav = sharedPref.getStringSet("favorites", new LinkedHashSet<String>());
-        ArrayList<HashMap<String, String>> fav_array = new ArrayList<>();
-        for (String s : fav) {
-            String[] ss = s.split(";");
-            HashMap<String, String> map = new HashMap<>();
-            map.put("from", ss[0]);
-            map.put("to", ss[1]);
-            fav_array.add(map);
-        }
-        return fav_array;
-
-    }
-
-    public void writeFavorites(ArrayList<HashMap<String, String>> fav) {
-        SharedPreferences sharedPref = getSharedPreferences(
-                getString(R.string.preferences_key), Context.MODE_PRIVATE);
-        Set<String> favorites = new LinkedHashSet<>();
-        //ArrayList<String> fav2 = new ArrayList<>();
-        for (HashMap<String, String> map : fav) {
-            favorites.add(TextUtils.join(";", new String[]{map.get("from"), map.get("to")}));
-        }
-
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putStringSet("favorites", favorites);
-        editor.apply();
-    }
-
     @Override
     public void updateFromDownload(Object res) {
         HashMap<String, Object> result = (HashMap<String, Object>) res;
         HashMap<String, String> request = (HashMap<String, String>) result.get("request");
+        String result_string = (String) result.get("response");
 
         if (result.get("response").equals("error")) {
             Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_LONG).show();
@@ -237,17 +188,70 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         }
 
         if (request.get("url").equals(API_postaje)) {
-            String stations_string = (String) result.get("response");
-            //ArrayList<String> station_names = stationParser(stations_string);
-            Map<String, String> stations = stationParser(stations_string);
+            Map<String, String> stations = stationParser(result_string);
             slovenijabus_DB.updateStations(stations);
             station_names.clear();
             station_names.addAll(slovenijabus_DB.readStationsNames());
             adapter.notifyDataSetChanged();
 
-            Toast.makeText(this, "Download postaj usepešen :)", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Download postaj usepešen :)", Toast.LENGTH_SHORT).show();
+        }
+
+        if (request.get("url").equals(API_voznired)) {
+
+            if (result_string.equals("error")) {
+                return;
+            }
+
+            if (result_string.length() < 2) {
+                return;
+            }
+
+            if (request.containsKey("index")) {
+                int index = Integer.parseInt(request.get("index"));
+                ArrayList<String> next_buses = timetableParserFavorites(result_string);
+                for (int i = 0; i < next_buses.size(); i++) {
+                    if (i == 0) {
+                        favorites.get(index).put("first", next_buses.get(i));
+                    }
+                    if (i == 1) {
+                        favorites.get(index).put("second", next_buses.get(i));
+                    }
+                    if (i == 2) {
+                        favorites.get(index).put("third", next_buses.get(i));
+                    }
+                }
+                favorites_recycler_adapter.notifyItemChanged(index);
+            }
         }
     }
+
+    public ArrayList<String> timetableParserFavorites(String input) {
+        String[] splitted = input.split("\n");
+        ArrayList<String> output = new ArrayList<>();
+        for (int i = 0, j = 0; i < splitted.length && j < 3; i++) {
+            String s = splitted[i];
+            String[] separated = s.split("\\|");
+            String time_str = separated[6].substring(0, separated[6].length() - 3);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            String now = sdf.format(new Date());
+            if (now.compareTo(time_str) < 1) {
+                output.add(separated[6].substring(11, 16).replaceFirst("^0+(?!$)", ""));
+                j++;
+            }
+        }
+        return output;
+    }
+
+    public void getNext3Buses(int i, String data) {
+        HashMap<String, String> request = new HashMap<>();
+        request.put("url", API_voznired);
+        request.put("method", "POST");
+        request.put("data", data);
+        request.put("index", Integer.toString(i));
+        makeHttpRequest(request);
+    }
+
 
     @Override
     public NetworkInfo getActiveNetworkInfo() {

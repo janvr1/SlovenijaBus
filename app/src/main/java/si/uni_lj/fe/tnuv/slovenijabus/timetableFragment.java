@@ -37,15 +37,18 @@ public class timetableFragment extends Fragment implements DownloadCallback {
     ExpandableListView lv;
     TextView msg;
     private static final String ARG_REQUEST_STRING = "req_str";
+    private static final String ARG_INVALID_STATION = "invalid_station";
     private String request_string;
+    private boolean invalid_station;
 
     public timetableFragment() {
     }
 
-    public static timetableFragment newInstance(String param) {
+    public static timetableFragment newInstance(String param, boolean invalid) {
         timetableFragment fragment = new timetableFragment();
         Bundle args = new Bundle();
         args.putString(ARG_REQUEST_STRING, param);
+        args.putBoolean(ARG_INVALID_STATION, invalid);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,8 +58,11 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             request_string = getArguments().getString(ARG_REQUEST_STRING);
+            invalid_station = getArguments().getBoolean(ARG_INVALID_STATION);
         }
-        getTimetablesFromAPI(request_string);
+        if (!invalid_station) {
+            getTimetablesFromAPI(request_string);
+        }
     }
 
     @Override
@@ -66,6 +72,10 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         View view = inflater.inflate(R.layout.fragment_timetable, container, false);
         msg = view.findViewById(R.id.fragment_message);
         lv = view.findViewById(R.id.show_all_list);
+        if (invalid_station) {
+            msg.setText(R.string.invalid_station_message);
+            msg.setVisibility(View.VISIBLE);
+        }
         return view;
     }
 
@@ -113,7 +123,6 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                 timetable.put("duration", separated[8]);
                 timetable.put("price", separated[9].replace(".", ",") + " €");
                 timetable.put("line_data", separated[13]);
-                timetable.put("expired", "True");
                 outputTimetable.add(timetable);
             } else {
                 HashMap<String, String> timetable = new HashMap<>();
@@ -124,7 +133,6 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                 timetable.put("duration", separated[8]);
                 timetable.put("price", separated[9].replace(".", ",") + " €");
                 timetable.put("line_data", separated[13]);
-                timetable.put("expired", "False");
                 outputTimetable.add(timetable);
             }
         }

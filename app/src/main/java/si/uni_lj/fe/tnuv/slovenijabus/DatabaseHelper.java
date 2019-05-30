@@ -67,8 +67,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void removeFavoriteFromIndex(int index) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME_FAVORITES, null, null, null, null, null, null);
-        if (cursor.moveToFirst()) {
-            cursor.moveToPosition(index);
+        if (cursor.moveToPosition(index)) {
             String rowID = cursor.getString(cursor.getColumnIndex("id"));
             db.delete(TABLE_NAME_FAVORITES, "id=?", new String[]{rowID});
         }
@@ -79,7 +78,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT  * FROM " + TABLE_NAME_FAVORITES;
-        Cursor cursor = db.rawQuery(query, null);
+        Cursor cursor = db.query(TABLE_NAME_FAVORITES, null, null, null, null, null, null, null);
+        //Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
             do {
                 HashMap<String, String> fav = new HashMap<>();
@@ -101,7 +101,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         boolean isIn;
         String query = "SELECT * FROM " + TABLE_NAME_FAVORITES + " WHERE entry=? AND exit=?";
-        Cursor cursor = db.rawQuery(query, new String[]{entry, exit});
+        //Cursor cursor = db.rawQuery(query, new String[]{entry, exit});
+        Cursor cursor = db.query(TABLE_NAME_FAVORITES, new String[]{"id"}, "entry=? AND exit=?", new String[]{entry, exit},
+                null, null, null);
         if (cursor.getCount() > 0) {
             isIn = true;
         } else {
@@ -129,7 +131,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         HashMap<String, String> station_map = new HashMap<>();
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT  * FROM " + TABLE_NAME_STATIONS;
-        Cursor cursor = db.rawQuery(query, null);
+        Cursor cursor = db.query(TABLE_NAME_STATIONS, null, null, null, null, null, null);
+        //Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
             do {
                 station_map.put(cursor.getString(cursor.getColumnIndex("station_id")),
@@ -146,7 +149,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<String> station_names = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT  * FROM " + TABLE_NAME_STATIONS;
-        Cursor cursor = db.rawQuery(query, null);
+        Cursor cursor = db.query(TABLE_NAME_STATIONS, null, null, null, null, null, null);
+        //Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
             do {
                 station_names.add(cursor.getString(cursor.getColumnIndex("station_name")));
@@ -166,7 +170,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String output;
         String query = "SELECT * FROM " + TABLE_NAME_STATIONS + " WHERE station_id=?";
-        Cursor cursor = db.rawQuery(query, new String[]{id});
+        //Cursor cursor = db.rawQuery(query, new String[]{id});
+        Cursor cursor = db.query(TABLE_NAME_STATIONS, new String[]{"station_name"}, "station_id=?", new String[]{id},
+                null, null, null);
         if (cursor.moveToFirst()) {
             output = cursor.getString(cursor.getColumnIndex("station_name"));
         } else {
@@ -184,7 +190,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String output;
         String query = "SELECT * FROM " + TABLE_NAME_STATIONS + " WHERE station_name=?";
-        Cursor cursor = db.rawQuery(query, new String[]{name});
+        //Cursor cursor = db.rawQuery(query, new String[]{name});
+        Cursor cursor = db.query(TABLE_NAME_STATIONS, new String[]{"station_id"}, "station_name=?", new String[]{name},
+                null, null, null);
         if (cursor.moveToFirst()) {
             output = cursor.getString(cursor.getColumnIndex("station_id"));
         } else {

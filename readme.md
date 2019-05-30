@@ -1,11 +1,9 @@
 ### Stvari za implementacijo:
-* Popravit main screen v landscape orientaciji
+* Popravit main screen v landscape orientaciji (drugačen layout za landscape?)
+* Spremenit expandableListView v recycler view
 * Animacije
 * Dizajn
 * Tretji screen
 * Dodat en shortcut da ponoviš zadnje iskanje?
 * Prenos voznih redov za offline pregled
-* Prikaz 3 naslednjih busov v favorites
-* Detekcija neveljavnega imena postaje
 * Notification za buse
-* Spremenit listView in expandableListView v recycler view

@@ -83,7 +83,7 @@
             <ImageButton
                 android:id="@+id/favorite_button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="@android:color/transparent"
                 android:onClick="favoritesButton"
                 android:paddingLeft="16dp"
@@ -97,9 +97,8 @@
             <ImageButton
                 android:id="@+id/show_all_swap_direction"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="@android:color/transparent"
-                android:onClick="changeDirection"
                 android:paddingLeft="8dp"
                 android:src="@drawable/swap_arrows_horizontal_white"
                 android:text="@string/change_direction"
@@ -113,12 +112,12 @@
     <android.support.design.widget.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?actionBarSize"
+        android:layout_height="?actionBarSize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/show_all_toolbar"
         app:tabIndicatorColor="@color/colorAccent"
+        app:tabGravity="fill"
         app:tabBackground="@color/colorPrimary"
         app:tabSelectedTextColor="@android:color/primary_text_dark"
         app:tabTextColor="@android:color/secondary_text_dark" />

@@ -31,4 +31,5 @@
     <string name="company">Prevoznik:</string>
     <string name="line">Relacija:</string>
     <string name="via_stations">Vmesne postaje</string>
+    <string name="invalid_station_message">Vnesli ste neveljavno ime postaje.\nProsimo, da izbirate samo med postajami, ki so vam na voljo.</string>
 </resources>
