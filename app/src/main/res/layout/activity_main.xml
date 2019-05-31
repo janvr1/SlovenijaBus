@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    tools:context=".MainActivity">
+    android:padding="8dp">
 
     <android.support.v7.widget.CardView
         android:id="@+id/vstopna_vnos_cardview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginBottom="12dp"
+        app:cardUseCompatPadding="true"
+        android:outlineAmbientShadowColor="@android:color/black"
         app:layout_constraintBottom_toTopOf="@+id/izstopna_vnos_cardview"
         app:layout_constraintEnd_toStartOf="@+id/main_swap_stations"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,8 +31,8 @@
         android:id="@+id/izstopna_vnos_cardview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="8dp"
+        app:cardUseCompatPadding="true"
+        android:outlineAmbientShadowColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="@id/vstopna_vnos_cardview"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/vstopna_vnos_cardview">
@@ -49,50 +47,75 @@
             android:textSize="20sp" />
     </android.support.v7.widget.CardView>
 
-    <TextView
+    <Button
         android:id="@+id/prikazi_vse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:background="@drawable/button_rounded"
         android:onClick="launchShowAll"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         android:text="@string/showAll_button"
-        android:textColor="@android:color/primary_text_light"
-        android:textSize="22sp"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
         android:textStyle="normal"
         app:layout_constraintEnd_toStartOf="@+id/main_guidelineMid"
-        app:layout_constraintTop_toBottomOf="@+id/datum_vnos" />
+        app:layout_constraintTop_toBottomOf="@+id/datum_cardview" />
 
-    <TextView
+    <Button
         android:id="@+id/najdi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:text="@string/showSingle_button"
-        android:textColor="@android:color/primary_text_light"
-        android:textSize="22sp"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         android:textStyle="normal"
-        app:layout_constraintBaseline_toBaselineOf="@+id/prikazi_vse"
+        android:background="@drawable/button_rounded"
+        app:layout_constraintBaseline_toBaselineOf="@id/prikazi_vse"
         app:layout_constraintStart_toStartOf="@+id/main_guidelineMid" />
 
-    <TextView
-        android:id="@+id/datum_vnos"
+
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:background="@android:color/transparent"
-        android:onClick="setDate"
-        android:textColor="@android:color/primary_text_light"
-        android:textSize="22sp"
-        android:textStyle="normal"
+        android:src="@drawable/date_icon_black"
+        app:layout_constraintTop_toTopOf="@id/datum_cardview"
+        app:layout_constraintBottom_toBottomOf="@id/datum_cardview"
+        app:layout_constraintEnd_toStartOf="@id/datum_cardview" />
+
+    <android.support.v7.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/datum_cardview"
+        app:cardCornerRadius="8dp"
+        android:outlineAmbientShadowColor="@android:color/black"
+        app:layout_constraintTop_toBottomOf="@id/izstopna_vnos_cardview"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/izstopna_vnos_cardview" />
+        app:cardUseCompatPadding="true"
+        android:layout_marginTop="12dp">
+
+        <TextView
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:id="@+id/datum_vnos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:onClick="setDate"
+            android:textColor="@android:color/primary_text_light"
+            android:textSize="22sp"
+            android:textStyle="normal" />
+    </android.support.v7.widget.CardView>
 
     <TextView
         android:id="@+id/favorites_textView"
@@ -118,21 +141,12 @@
 
     </android.support.v7.widget.RecyclerView>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingRight="16dp"
-        android:src="@drawable/date_icon_black"
-        app:layout_constraintBottom_toBottomOf="@id/datum_vnos"
-        app:layout_constraintEnd_toStartOf="@id/datum_vnos"
-        app:layout_constraintTop_toTopOf="@id/datum_vnos" />
-
     <ImageButton
         android:id="@+id/main_swap_stations"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="@android:color/transparent"

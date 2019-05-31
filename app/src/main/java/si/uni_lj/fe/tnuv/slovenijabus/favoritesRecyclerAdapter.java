@@ -22,6 +22,7 @@ public class favoritesRecyclerAdapter extends RecyclerView.Adapter<favoritesRecy
     private TextView mDateView;
     DatabaseHelper slovenijabus_DB;
 
+
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.favorites_list_item,

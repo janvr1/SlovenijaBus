@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,29 +27,27 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements DownloadCallback {
 
-    private int year, month, day, end_day;
-    private TextView dateView;
-    private AutoCompleteTextView entryView;
-    private AutoCompleteTextView exitView;
-
-    public static final String EXTRA_DATE = "intentData.DATE";
-    public static final String EXTRA_ENTRY = "intentData.ENTRY";
-    public static final String EXTRA_EXIT = "intentData.EXIT";
-
     public static final String API_postaje =
             "https://www.ap-ljubljana.si/_vozni_red/get_postajalisca_vsa_v2.php"; // GET request
 
     public static final String API_voznired =
             "https://www.ap-ljubljana.si/_vozni_red/get_vozni_red_0.php";
 
-    //public static Map<String, String> stations_map = new HashMap<>();
+    public static final String EXTRA_DATE = "intentData.DATE";
+    public static final String EXTRA_ENTRY = "intentData.ENTRY";
+    public static final String EXTRA_EXIT = "intentData.EXIT";
+
+    private int year, month, day, end_day;
+    private TextView dateView;
+    private AutoCompleteTextView entryView;
+    private AutoCompleteTextView exitView;
+
     public ArrayList<String> station_names = new ArrayList<>();
-    SimpleAdapter favorites_adapter;
     ArrayAdapter<String> adapter;
-    final ArrayList<HashMap<String, String>> favorites = new ArrayList<>();
 
     DatabaseHelper slovenijabus_DB;
 
+    final ArrayList<HashMap<String, String>> favorites = new ArrayList<>();
     private RecyclerView.Adapter favorites_recycler_adapter;
     private RecyclerView.LayoutManager favorites_layout_manager;
     private RecyclerView favorites_rv;
@@ -71,11 +68,13 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         end_day = calendar.get(Calendar.DAY_OF_MONTH) + 14; // Datum za do dva tedna v naprej <—— To ne bo dobr delal, če je do konca meseca manj kot dva tedna ;)
 
         dateView = findViewById(R.id.datum_vnos);
+
         if (savedInstanceState != null) {
             dateView.setText(savedInstanceState.getString("date"));
         } else {
             dateView.setText(dateStringBuilder(year, month, day));
         }
+
         entryView = findViewById(R.id.vstopna_vnos);
         exitView = findViewById(R.id.izstopna_vnos);
 
@@ -97,20 +96,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     @Override
     protected void onStart() {
         super.onStart();
-        
-        ArrayList<HashMap<String, String>> new_favorites = slovenijabus_DB.readFavorites();
-        if (favoritesChanged(new_favorites, favorites)) {
-            favorites.clear();
-            favorites.addAll(slovenijabus_DB.readFavorites());
-            favorites_recycler_adapter.notifyDataSetChanged();
-        }
-
-        for (int i = 0; i < favorites.size(); i++) {
-            String request_data = "VSTOP_ID=" + slovenijabus_DB.getStationIDFromName(favorites.get(i).get("entry"))
-                    + "&IZSTOP_ID=" + slovenijabus_DB.getStationIDFromName(favorites.get(i).get("exit")) + "&DATUM="
-                    + dateStringBuilder(year, month, day);
-            getNext3Buses(i, request_data);
-        }
+        updateFavorites();
     }
 
     @Override
@@ -129,6 +115,22 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         return day + "." + month + "." + year;
     }
 
+    public void updateFavorites() {
+        ArrayList<HashMap<String, String>> new_favorites = slovenijabus_DB.readFavorites();
+        if (favoritesChanged(new_favorites, favorites)) {
+            favorites.clear();
+            favorites.addAll(slovenijabus_DB.readFavorites());
+            favorites_recycler_adapter.notifyDataSetChanged();
+        }
+
+        for (int i = 0; i < favorites.size(); i++) {
+            String request_data = createRequestString(slovenijabus_DB.getStationIDFromName(favorites.get(i).get("entry")),
+                    slovenijabus_DB.getStationIDFromName(favorites.get(i).get("exit")),
+                    dateStringBuilder(year, month, day));
+            getNext3Buses(i, request_data);
+        }
+    }
+
     public void launchShowAll(View view) {
         String entryStation = entryView.getText().toString();
         String exitStation = exitView.getText().toString();
@@ -138,6 +140,11 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         intent.putExtra(EXTRA_EXIT, slovenijabus_DB.getStationIDFromName(exitStation));
         intent.putExtra(EXTRA_DATE, date);
         startActivity(intent);
+    }
+
+    public String createRequestString(String vstopID, String izstopID, String datum) {
+        String request = "VSTOP_ID=" + vstopID + "&IZSTOP_ID=" + izstopID + "&DATUM=" + datum;
+        return request;
     }
 
     public void makeHttpRequest(HashMap<String, String> request) {
@@ -164,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     }
 
     public Map<String, String> stationParser(String input) {
-        //ArrayList<String> station_names = new ArrayList<>();
         String[] splitted = input.split("\n");
         Map<String, String> station_map = new HashMap<>();
 
@@ -173,9 +179,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
             if (current.charAt(0) == "0".charAt(0)) {
                 String x = current.substring(current.indexOf(":") + 1);
                 String[] separated = x.split("\\|");
-                //stations_map.put(separated[1], separated[0]);
                 station_map.put(separated[0], separated[1]);
-                //station_names.add(separated[1]);
             }
         }
         return station_map;
@@ -198,8 +202,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
             station_names.clear();
             station_names.addAll(slovenijabus_DB.readStationsNames());
             adapter.notifyDataSetChanged();
-
-            //Toast.makeText(this, "Download postaj usepešen :)", Toast.LENGTH_SHORT).show();
         }
 
         if (request.get("url").equals(API_voznired)) {
@@ -217,6 +219,13 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 Log.d("favorites_index", request.get("index"));
                 ArrayList<String> next_buses = timetableParserFavorites(result_string);
                 boolean change = false;
+
+                if (next_buses.size() < (favorites.get(index).size() - 2)) {
+                    change = true;
+                    favorites.get(index).remove("first");
+                    favorites.get(index).remove("second");
+                    favorites.get(index).remove("third");
+                }
                 for (int i = 0; i < next_buses.size(); i++) {
                     if (i == 0) {
                         if (!next_buses.get(i).equals(favorites.get(index).get("first"))) {
@@ -237,14 +246,10 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                         favorites.get(index).put("third", next_buses.get(i));
                     }
                 }
+
                 if (change) {
                     favorites_recycler_adapter.notifyItemChanged(index);
                 }
-                Log.d("favorites_array", "start");
-                for (HashMap<String, String> hm : favorites) {
-                    Log.d("favorites_array", hm.toString());
-                }
-                Log.d("favorites_array", "end");
             }
         }
     }
@@ -263,6 +268,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 j++;
             }
         }
+        Log.d("timetableparser", output.toString());
         return output;
     }
 
@@ -272,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         request.put("method", "POST");
         request.put("data", data);
         request.put("index", Integer.toString(i));
+        Log.d("request_data", data);
         makeHttpRequest(request);
     }
 

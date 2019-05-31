@@ -49,7 +49,8 @@ public class showAllActivity extends AppCompatActivity {
             invalid_station = false;
         }
 
-        String request_data = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date;
+        //String request_data = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date;
+        String request_data = createRequestString(entryStationID, exitStationID, date);
 
         String date2 = null, date3 = null;
 
@@ -66,8 +67,8 @@ public class showAllActivity extends AppCompatActivity {
             Log.d("parse exception", "something no worky worky");
         }
 
-        String request_data2 = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date2;
-        String request_data3 = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date3;
+        String request_data2 = createRequestString(entryStationID, exitStationID, date2);
+        String request_data3 = createRequestString(entryStationID, exitStationID, date3);
 
         String entryName = slovenijabus_DB.getStationNameFromID(entryStationID);
         String exitName = slovenijabus_DB.getStationNameFromID(exitStationID);
@@ -96,7 +97,6 @@ public class showAllActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        Log.d("showAllActivity", entryName + " " + exitName);
         if (slovenijabus_DB.checkIfIn(entryName, exitName)) {
             ImageButton fav_btn = findViewById(R.id.favorite_button);
             fav_btn.setImageResource(R.drawable.heart_full_white);
@@ -109,17 +109,15 @@ public class showAllActivity extends AppCompatActivity {
                 changeDirection(v);
             }
         });
-
     }
 
+    
     public void favoritesButton(View view) {
-
         Intent intent = getIntent();
         String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
         String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
         String entryName = slovenijabus_DB.getStationNameFromID(entryStationID);
         String exitName = slovenijabus_DB.getStationNameFromID(exitStationID);
-        //int index = checkIfInFavorites(favorites, entryStationID, exitStationID);
         boolean isIn = slovenijabus_DB.checkIfIn(entryName, exitName);
 
         ImageButton fav_btn = findViewById(R.id.favorite_button);
@@ -158,5 +156,10 @@ public class showAllActivity extends AppCompatActivity {
     private String dateStringBuilder(int year, int month, int day) {
         month++; // da je pravilen mesec :)
         return day + "." + month + "." + year;
+    }
+
+    public String createRequestString(String vstopID, String izstopID, String datum) {
+        String request = "VSTOP_ID=" + vstopID + "&IZSTOP_ID=" + izstopID + "&DATUM=" + datum;
+        return request;
     }
 }

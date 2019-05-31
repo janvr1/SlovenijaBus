@@ -110,31 +110,20 @@ public class timetableFragment extends Fragment implements DownloadCallback {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             String now = sdf.format(new Date());
             Log.d("time_string_now", now);
-            if (now.compareTo(time_str) < 1) {
-                if (first) {
-                    first = false;
-                    first_index = i;
-                }
-                HashMap<String, String> timetable = new HashMap<>();
-                timetable.put("entry_time", separated[6].substring(11, 16).replaceFirst("^0+(?!$)", ""));
-                timetable.put("exit_time", separated[7].substring(11, 16).replaceFirst("^0+(?!$)", ""));
-                timetable.put("entry_time_long", separated[6]);
-                timetable.put("exit_time_long", separated[7]);
-                timetable.put("duration", separated[8]);
-                timetable.put("price", separated[9].replace(".", ",") + " €");
-                timetable.put("line_data", separated[13]);
-                outputTimetable.add(timetable);
-            } else {
-                HashMap<String, String> timetable = new HashMap<>();
-                timetable.put("entry_time", separated[6].substring(11, 16).replaceFirst("^0+(?!$)", ""));
-                timetable.put("exit_time", separated[7].substring(11, 16).replaceFirst("^0+(?!$)", ""));
-                timetable.put("entry_time_long", separated[6]);
-                timetable.put("exit_time_long", separated[7]);
-                timetable.put("duration", separated[8]);
-                timetable.put("price", separated[9].replace(".", ",") + " €");
-                timetable.put("line_data", separated[13]);
-                outputTimetable.add(timetable);
+            if (now.compareTo(time_str) < 1 && first) {
+                first = false;
+                first_index = i;
             }
+            HashMap<String, String> timetable = new HashMap<>();
+            timetable.put("entry_time", separated[6].substring(11, 16).replaceFirst("^0+(?!$)", ""));
+            timetable.put("exit_time", separated[7].substring(11, 16).replaceFirst("^0+(?!$)", ""));
+            timetable.put("date", separated[6].substring(0, 10));
+            timetable.put("entry_time_long", separated[6]);
+            timetable.put("exit_time_long", separated[7]);
+            timetable.put("duration", separated[8]);
+            timetable.put("price", separated[9].replace(".", ",") + " €");
+            timetable.put("line_data", separated[13]);
+            outputTimetable.add(timetable);
         }
         if (first) {
             first_index = outputTimetable.size();
@@ -151,6 +140,11 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         HashMap<String, Object> result = (HashMap<String, Object>) res;
         HashMap<String, String> request = (HashMap<String, String>) result.get("request");
         String result_string = (String) result.get("response");
+
+        if (getActivity() == null) {
+            Log.d("fragment", "disaster avoided");
+            return;
+        }
 
         if (request.get("url").equals(API_voznired)) {
 
@@ -170,6 +164,22 @@ public class timetableFragment extends Fragment implements DownloadCallback {
             int first_index = (int) data.get("index");
             ArrayList<HashMap<String, String>> timetable = (ArrayList<HashMap<String, String>>) data.get("timetable");
 
+            SimpleDateFormat sdf_request = new SimpleDateFormat("dd.MM.yyyy");
+            SimpleDateFormat sdf_response = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                Date request_date = sdf_request.parse(request_string.split("=")[3]);
+                Date response_date = sdf_response.parse(timetable.get(0).get("date"));
+                if (request_date.before(response_date)) {
+                    msg.setText(getString(R.string.no_buses_on_this_day, sdf_request.format(response_date)));
+                    msg.setVisibility(View.VISIBLE);
+                }
+                Log.d("fragment_request_date", request_date.toString());
+                Log.d("fragment_response_date", response_date.toString());
+            } catch (Exception e) {
+                Log.d("fragment_parse_excptn", "No worky worky");
+                Log.d("fragment_request_date", request_string.split("=")[3]);
+                Log.d("fragment_response_date", timetable.get(0).get("date"));
+            }
             lv.setVisibility(View.VISIBLE);
 
             listOfChildGroups = new ArrayList<>();
