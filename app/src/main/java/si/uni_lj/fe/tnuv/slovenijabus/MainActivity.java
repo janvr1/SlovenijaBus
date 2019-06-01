@@ -220,11 +220,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 ArrayList<String> next_buses = timetableParserFavorites(result_string);
                 boolean change = false;
 
-                String request_string = request.get("data");
-
-
-
-
                 if (next_buses.size() < (favorites.get(index).size() - 2)) {
                     change = true;
                     favorites.get(index).remove("first");
@@ -273,12 +268,10 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
             if (today_date.before(response_date)) {
                 return output;
             }
-            Log.d("fragment_request_date", today_date.toString());
-            Log.d("fragment_response_date", response_date.toString());
         } catch (Exception e) {
             Log.d("fragment_parse_excptn", "No worky worky");
-            Log.d("fragment_request_date", sdf2.format(new Date()));
-            Log.d("fragment_response_date", response_date_string);
+            Log.d("main_act_request_date", sdf2.format(new Date()));
+            Log.d("main_act_response_date", response_date_string);
         }
 
         for (int i = 0, j = 0; i < splitted.length && j < 3; i++) {
