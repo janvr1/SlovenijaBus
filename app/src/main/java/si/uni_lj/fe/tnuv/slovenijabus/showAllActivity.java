@@ -111,7 +111,7 @@ public class showAllActivity extends AppCompatActivity {
         });
     }
 
-    
+
     public void favoritesButton(View view) {
         Intent intent = getIntent();
         String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
