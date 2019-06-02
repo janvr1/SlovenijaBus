@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +36,8 @@ public class timetableFragment extends Fragment implements DownloadCallback {
     private static final String ARG_INVALID_STATION = "invalid_station";
     private String request_string;
     private boolean invalid_station;
+
+    private ProgressBar progressBar;
 
     public timetableFragment() {
     }
@@ -71,7 +74,11 @@ public class timetableFragment extends Fragment implements DownloadCallback {
             showAll_rv.setVisibility(View.GONE);
             msg.setText(R.string.invalid_station_message);
             msg.setVisibility(View.VISIBLE);
+        } else {
+            progressBar = view.findViewById(R.id.progressBar);
+            progressBar.setVisibility(View.VISIBLE);
         }
+
         return view;
     }
 
@@ -136,6 +143,8 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         HashMap<String, Object> result = (HashMap<String, Object>) res;
         HashMap<String, String> request = (HashMap<String, String>) result.get("request");
         String result_string = (String) result.get("response");
+
+        progressBar.setVisibility(View.GONE);
 
         if (getActivity() == null) {
             Log.d("fragment", "disaster avoided");
