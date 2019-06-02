@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class timetableFragment extends Fragment implements DownloadCallback {
     private RecyclerView.LayoutManager showAll_layoutManager;
     private RecyclerView showAll_rv;
 
-    TextView msg;
+    TextView msg, msg_fullscreen;
     private static final String ARG_REQUEST_STRING = "req_str";
     private static final String ARG_INVALID_STATION = "invalid_station";
     private String request_string;
@@ -58,9 +57,6 @@ public class timetableFragment extends Fragment implements DownloadCallback {
             request_string = getArguments().getString(ARG_REQUEST_STRING);
             invalid_station = getArguments().getBoolean(ARG_INVALID_STATION);
         }
-        if (!invalid_station) {
-            getTimetablesFromAPI(request_string);
-        }
     }
 
     @Override
@@ -69,13 +65,17 @@ public class timetableFragment extends Fragment implements DownloadCallback {
 
         View view = inflater.inflate(R.layout.fragment_timetable, container, false);
         msg = view.findViewById(R.id.fragment_message);
+        msg_fullscreen = view.findViewById(R.id.fragment_message_fullscreen);
         showAll_rv = view.findViewById(R.id.show_all_list);
+        progressBar = view.findViewById(R.id.progressBar);
+        if (!invalid_station) {
+            getTimetablesFromAPI(request_string);
+        }
         if (invalid_station) {
             showAll_rv.setVisibility(View.GONE);
-            msg.setText(R.string.invalid_station_message);
-            msg.setVisibility(View.VISIBLE);
+            msg_fullscreen.setText(R.string.invalid_station_message);
+            msg_fullscreen.setVisibility(View.VISIBLE);
         } else {
-            progressBar = view.findViewById(R.id.progressBar);
             progressBar.setVisibility(View.VISIBLE);
         }
 
@@ -96,7 +96,10 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         if (netInfo != null && netInfo.isConnected()) {
             new DownloadAsyncTask(this).execute(request);
         } else {
-            Toast.makeText(getActivity().getApplicationContext(), R.string.network_error_message, Toast.LENGTH_SHORT).show();
+            showAll_rv.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+            msg_fullscreen.setText(R.string.network_error_message);
+            msg_fullscreen.setVisibility(View.VISIBLE);
         }
     }
 
@@ -155,15 +158,15 @@ public class timetableFragment extends Fragment implements DownloadCallback {
 
             if (result_string.equals("error")) {
                 showAll_rv.setVisibility(View.GONE);
-                msg.setText(R.string.network_error_message);
-                msg.setVisibility(View.VISIBLE);
+                msg_fullscreen.setText(R.string.network_error_message);
+                msg_fullscreen.setVisibility(View.VISIBLE);
                 return;
             }
 
             if (result_string.length() < 2) {
                 showAll_rv.setVisibility(View.GONE);
-                msg.setText(R.string.no_buses_message);
-                msg.setVisibility(View.VISIBLE);
+                msg_fullscreen.setText(R.string.no_buses_message);
+                msg_fullscreen.setVisibility(View.VISIBLE);
                 return;
             }
 
