@@ -70,7 +70,7 @@ public class DownloadAsyncTask extends AsyncTask<HashMap<String, String>, Void, 
 
             // Convert the InputStream into a string
             String contentAsString = convertStreamToString(inputStream);
-            Log.d(DEBUG_TAG, "Vsebina: " + contentAsString);
+            //Log.d(DEBUG_TAG, "Vsebina: " + contentAsString);
             HashMap<String, Object> result = new HashMap();
             result.put("response", contentAsString);
             result.put("request", input);

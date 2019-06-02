@@ -30,7 +30,7 @@
     <string name="price">Cena:</string>
     <string name="company">Prevoznik:</string>
     <string name="line">Relacija:</string>
-    <string name="via_stations">Vmesne postaje</string>
+    <string name="via_stations">Vmesne postaje:</string>
     <string name="invalid_station_message">Vnesli ste neveljavno ime postaje.\nProsimo, da izbirate samo med postajami, ki so vam na voljo.</string>
     <string name="no_buses_on_this_day">Na ta dan ni odhodov. Prikazani so odhodi za dan %1$s.</string>
 </resources>

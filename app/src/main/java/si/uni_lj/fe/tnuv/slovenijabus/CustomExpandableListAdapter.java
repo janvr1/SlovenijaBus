@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2006 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package si.uni_lj.fe.tnuv.slovenijabus;
 
 import android.content.Context;
@@ -28,19 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * An easy adapter to map static data to group and child views defined in an XML
- * file. You can separately specify the data backing the group as a List of
- * Maps. Each entry in the ArrayList corresponds to one group in the expandable
- * list. The Maps contain the data for each row. You also specify an XML file
- * that defines the views used to display a group, and a mapping from keys in
- * the Map to specific views. This process is similar for a child, except it is
- * one-level deeper so the data backing is specified as a List<List<Map>>,
- * where the first List corresponds to the group of the child, the second List
- * corresponds to the position of the child within the group, and finally the
- * Map holds the data for that particular child.
- */
 public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
+    private Context mContext;
+
     private List<? extends Map<String, ?>> mGroupData;
     private int mGroupLayout;
     private String[] mGroupFrom;
@@ -82,7 +56,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        Context mContext = context;
+        mContext = context;
         mIndex = index;
         expired_color = mContext.getColor(R.color.expiredColor);
         defaultChildTextColor = mContext.getColor(android.R.color.secondary_text_light);
@@ -98,7 +72,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
-
         ViewGroup vg;
         boolean firstChild;
         if (childPosition == 0) {
@@ -133,17 +106,10 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         } else {
             bindView(vg, mChildData.get(groupPosition).get(childPosition), mChildFrom, mChildTo);
         }
-
         return vg;
     }
 
-    /**
-     * Instantiates a new View for a child.
-     *
-     * @param isLastChild Whether the child is the last child within its group.
-     * @param parent      The eventual parent of this new View.
-     * @return A new child View
-     */
+
     public View newChildView(boolean isFirstChild, ViewGroup parent) {
         return mInflater.inflate((isFirstChild) ? mFirstChildLayout : mChildLayout, parent, false);
     }
@@ -180,16 +146,16 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         ViewGroup vg;
         if (convertView == null) {
             vg = (ViewGroup) newGroupView(isExpanded, parent);
-            defaultGroupTextColors = getTextColors(vg, R.id.show_all_list_item);
+            defaultGroupTextColors = getTextColors(vg, R.id.show_all_group_viewgroup);
             if (groupPosition < mIndex) {
-                setAllTextColor(vg, expired_color, R.id.show_all_list_item);
+                setAllTextColor(vg, expired_color, R.id.show_all_group_viewgroup);
             }
         } else {
             vg = (ViewGroup) convertView;
             if (groupPosition < mIndex) {
-                setAllTextColor(vg, expired_color, R.id.show_all_list_item);
+                setAllTextColor(vg, expired_color, R.id.show_all_group_viewgroup);
             } else {
-                setTextColors(vg, defaultGroupTextColors, R.id.show_all_list_item);
+                setTextColors(vg, defaultGroupTextColors, R.id.show_all_group_viewgroup);
             }
         }
         Log.d("adapter_group_position", Integer.toString(groupPosition));
@@ -259,7 +225,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                 j++;
             }
         }
-
     }
 
 }
