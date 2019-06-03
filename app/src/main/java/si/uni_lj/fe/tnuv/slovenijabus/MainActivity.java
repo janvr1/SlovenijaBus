@@ -9,7 +9,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -216,7 +215,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
             if (request.containsKey("index")) {
                 int index = Integer.parseInt(request.get("index"));
-                Log.d("favorites_index", request.get("index"));
                 ArrayList<String> next_buses = timetableParserFavorites(result_string);
                 boolean change = false;
 
@@ -269,9 +267,9 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 return output;
             }
         } catch (Exception e) {
-            Log.d("fragment_parse_excptn", "No worky worky");
+            /*Log.d("fragment_parse_excptn", "No worky worky");
             Log.d("main_act_request_date", sdf2.format(new Date()));
-            Log.d("main_act_response_date", response_date_string);
+            Log.d("main_act_response_date", response_date_string);*/
         }
 
         for (int i = 0, j = 0; i < splitted.length && j < 3; i++) {
@@ -285,7 +283,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 j++;
             }
         }
-        Log.d("timetableparser", output.toString());
         return output;
     }
 
@@ -295,7 +292,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         request.put("method", "POST");
         request.put("data", data);
         request.put("index", Integer.toString(i));
-        Log.d("request_data", data);
         makeHttpRequest(request);
     }
 

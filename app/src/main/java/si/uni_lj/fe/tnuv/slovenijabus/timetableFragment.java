@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,10 +108,10 @@ public class timetableFragment extends Fragment implements DownloadCallback {
             String s = splitted[i];
             String[] separated = s.split("\\|");
             String time_str = separated[6].substring(0, separated[6].length() - 3);
-            Log.d("time_string", time_str);
+
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             String now = sdf.format(new Date());
-            Log.d("time_string_now", now);
+
             if (now.compareTo(time_str) < 1 && first) {
                 first = false;
                 first_index = i;
@@ -147,7 +146,7 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         progressBar.setVisibility(View.GONE);
 
         if (getActivity() == null) {
-            Log.d("fragment", "disaster avoided");
+            //Log.d("fragment", "disaster avoided");
             return;
         }
 
@@ -180,12 +179,10 @@ public class timetableFragment extends Fragment implements DownloadCallback {
                     msg.setText(getString(R.string.no_buses_on_this_day, sdf_request.format(response_date)));
                     msg.setVisibility(View.VISIBLE);
                 }
-                Log.d("fragment_request_date", request_date.toString());
-                Log.d("fragment_response_date", response_date.toString());
             } catch (Exception e) {
-                Log.d("fragment_parse_excptn", "No worky worky");
+/*                Log.d("fragment_parse_excptn", "No worky worky");
                 Log.d("fragment_request_date", request_string.split("=")[3]);
-                Log.d("fragment_response_date", timetable.get(0).get("date"));
+                Log.d("fragment_response_date", timetable.get(0).get("date"));*/
             }
             //showAll_rv.setVisibility(View.VISIBLE);
 

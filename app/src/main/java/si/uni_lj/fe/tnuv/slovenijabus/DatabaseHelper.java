@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,9 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<HashMap<String, String>> favorites = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT  * FROM " + TABLE_NAME_FAVORITES;
         Cursor cursor = db.query(TABLE_NAME_FAVORITES, null, null, null, null, null, null, null);
-        //Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
             do {
                 HashMap<String, String> fav = new HashMap<>();
@@ -100,15 +97,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         SQLiteDatabase db = this.getReadableDatabase();
         boolean isIn;
-        String query = "SELECT * FROM " + TABLE_NAME_FAVORITES + " WHERE entry=? AND exit=?";
-        //Cursor cursor = db.rawQuery(query, new String[]{entry, exit});
         Cursor cursor = db.query(TABLE_NAME_FAVORITES, new String[]{"id"}, "entry=? AND exit=?", new String[]{entry, exit},
                 null, null, null);
-        if (cursor.getCount() > 0) {
-            isIn = true;
-        } else {
-            isIn = false;
-        }
+        isIn = cursor.getCount() > 0;
         cursor.close();
         db.close();
         return isIn;
@@ -130,9 +121,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Map<String, String> readStationsMap() {
         HashMap<String, String> station_map = new HashMap<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT  * FROM " + TABLE_NAME_STATIONS;
         Cursor cursor = db.query(TABLE_NAME_STATIONS, null, null, null, null, null, null);
-        //Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
             do {
                 station_map.put(cursor.getString(cursor.getColumnIndex("station_id")),
@@ -148,9 +137,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<String> readStationsNames() {
         ArrayList<String> station_names = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT  * FROM " + TABLE_NAME_STATIONS;
         Cursor cursor = db.query(TABLE_NAME_STATIONS, null, null, null, null, null, null);
-        //Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
             do {
                 station_names.add(cursor.getString(cursor.getColumnIndex("station_name")));
@@ -169,8 +156,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         String output;
-        String query = "SELECT * FROM " + TABLE_NAME_STATIONS + " WHERE station_id=?";
-        //Cursor cursor = db.rawQuery(query, new String[]{id});
         Cursor cursor = db.query(TABLE_NAME_STATIONS, new String[]{"station_name"}, "station_id=?", new String[]{id},
                 null, null, null);
         if (cursor.moveToFirst()) {
@@ -189,8 +174,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         SQLiteDatabase db = this.getReadableDatabase();
         String output;
-        String query = "SELECT * FROM " + TABLE_NAME_STATIONS + " WHERE station_name=?";
-        //Cursor cursor = db.rawQuery(query, new String[]{name});
         Cursor cursor = db.query(TABLE_NAME_STATIONS, new String[]{"station_id"}, "station_name=?", new String[]{name},
                 null, null, null);
         if (cursor.moveToFirst()) {
@@ -203,29 +186,4 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return output;
     }
 
-    public String tableToString(SQLiteDatabase db, String tableName) {
-        Log.d("", "tableToString called");
-        String tableString = String.format("Table %s:\n", tableName);
-        Cursor allRows = db.rawQuery("SELECT * FROM " + tableName, null);
-        tableString += cursorToString(allRows);
-        return tableString;
-    }
-
-    public String cursorToString(Cursor cursor) {
-        String cursorString = "";
-        if (cursor.moveToFirst()) {
-            String[] columnNames = cursor.getColumnNames();
-            for (String name : columnNames)
-                cursorString += String.format("%s ][ ", name);
-            cursorString += "\n";
-            do {
-                for (String name : columnNames) {
-                    cursorString += String.format("%s ][ ",
-                            cursor.getString(cursor.getColumnIndex(name)));
-                }
-                cursorString += "\n";
-            } while (cursor.moveToNext());
-        }
-        return cursorString;
-    }
 }

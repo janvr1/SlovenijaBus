@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -18,7 +17,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 public class showAllActivity extends AppCompatActivity {
@@ -43,11 +41,7 @@ public class showAllActivity extends AppCompatActivity {
         String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
         String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
         boolean invalid_station;
-        if (entryStationID == null || exitStationID == null) {
-            invalid_station = true;
-        } else {
-            invalid_station = false;
-        }
+        invalid_station = entryStationID == null || exitStationID == null;
 
         //String request_data = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date;
         String request_data = createRequestString(entryStationID, exitStationID, date);
@@ -60,11 +54,11 @@ public class showAllActivity extends AppCompatActivity {
             Calendar c = Calendar.getInstance();
             c.setTime(date1);
             c.add(Calendar.DAY_OF_MONTH, 1);
-            date2 = dateStringBuilder(c.get(c.YEAR), c.get(c.MONTH), c.get(c.DAY_OF_MONTH));
+            date2 = dateStringBuilder(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
             c.add(Calendar.DAY_OF_MONTH, 1);
-            date3 = dateStringBuilder(c.get(c.YEAR), c.get(c.MONTH), c.get(c.DAY_OF_MONTH));
+            date3 = dateStringBuilder(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
         } catch (Exception e) {
-            Log.d("parse exception", "something no worky worky");
+//            Log.d("parse exception", "something no worky worky");
         }
 
         String request_data2 = createRequestString(entryStationID, exitStationID, date2);
@@ -145,12 +139,6 @@ public class showAllActivity extends AppCompatActivity {
         newIntent.putExtra(MainActivity.EXTRA_DATE, date);
         startActivity(newIntent);
         finish();
-    }
-
-    public void dumpDBtoLog() {
-        for (HashMap<String, String> hm : slovenijabus_DB.readFavorites()) {
-            Log.d("db", hm.toString());
-        }
     }
 
     private String dateStringBuilder(int year, int month, int day) {

@@ -1,7 +1,6 @@
 package si.uni_lj.fe.tnuv.slovenijabus;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -64,13 +63,12 @@ public class DownloadAsyncTask extends AsyncTask<HashMap<String, String>, Void, 
 
             //cakamo na odziv (zaradi tega cakanja je potrebna locena nit!)
             int response = conn.getResponseCode();
-            Log.d(DEBUG_TAG, "The response is: " + response);
 
             inputStream = new BufferedInputStream(conn.getInputStream());
 
             // Convert the InputStream into a string
             String contentAsString = convertStreamToString(inputStream);
-            //Log.d(DEBUG_TAG, "Vsebina: " + contentAsString);
+
             HashMap<String, Object> result = new HashMap();
             result.put("response", contentAsString);
             result.put("request", input);

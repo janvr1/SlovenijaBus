@@ -1,7 +1,6 @@
 package si.uni_lj.fe.tnuv.slovenijabus;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,11 +73,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                              View convertView, ViewGroup parent) {
         ViewGroup vg;
         boolean firstChild;
-        if (childPosition == 0) {
-            firstChild = true;
-        } else {
-            firstChild = false;
-        }
+        firstChild = childPosition == 0;
         if (convertView == null) {
             vg = (ViewGroup) newChildView(firstChild, parent);
         } else {
@@ -118,7 +113,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         int len = to.length;
 
         for (int i = 0; i < len; i++) {
-            TextView v = (TextView) view.findViewById(to[i]);
+            TextView v = view.findViewById(to[i]);
             if (v != null) {
                 v.setText((String) data.get(from[i]));
             }
@@ -158,8 +153,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                 setTextColors(vg, defaultGroupTextColors, R.id.show_all_group_viewgroup);
             }
         }
-        Log.d("adapter_group_position", Integer.toString(groupPosition));
-        Log.d("adapter_index", Integer.toString(mIndex));
         bindView(vg, mGroupData.get(groupPosition), mGroupFrom, mGroupTo);
         return vg;
     }
