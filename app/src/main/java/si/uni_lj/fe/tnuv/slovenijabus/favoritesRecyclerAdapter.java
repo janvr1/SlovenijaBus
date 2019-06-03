@@ -31,7 +31,7 @@ public class favoritesRecyclerAdapter extends RecyclerView.Adapter<favoritesRecy
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder viewHolder, int i) {
+    public void onBindViewHolder(final MyViewHolder viewHolder, final int i) {
         HashMap<String, String> favorite = mDataSet.get(i);
         viewHolder.from.setText(favorite.get("entry"));
         viewHolder.to.setText(favorite.get("exit"));
@@ -72,11 +72,10 @@ public class favoritesRecyclerAdapter extends RecyclerView.Adapter<favoritesRecy
         viewHolder.parent.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                int pos = viewHolder.getLayoutPosition();
-                slovenijabus_DB.removeFavoriteFromIndex(pos);
-                mDataSet.remove(pos);
-                notifyItemRemoved(pos);
-                //notifyDataSetChanged();
+                ;
+                slovenijabus_DB.removeFavoriteFromIndex(i);
+                mDataSet.remove(i);
+                notifyItemRemoved(i);
                 Toast.makeText(mContext, R.string.remove_from_favorites, Toast.LENGTH_LONG).show();
                 return true;
             }

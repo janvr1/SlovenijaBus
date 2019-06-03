@@ -36,18 +36,14 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     public static final String EXTRA_DATE = "intentData.DATE";
     public static final String EXTRA_ENTRY = "intentData.ENTRY";
     public static final String EXTRA_EXIT = "intentData.EXIT";
-
+    final ArrayList<HashMap<String, String>> favorites = new ArrayList<>();
+    public ArrayList<String> station_names = new ArrayList<>();
+    ArrayAdapter<String> adapter;
+    DatabaseHelper slovenijabus_DB;
     private int year, month, day, end_day;
     private TextView dateView;
     private AutoCompleteTextView entryView;
     private AutoCompleteTextView exitView;
-
-    public ArrayList<String> station_names = new ArrayList<>();
-    ArrayAdapter<String> adapter;
-
-    DatabaseHelper slovenijabus_DB;
-
-    final ArrayList<HashMap<String, String>> favorites = new ArrayList<>();
     private RecyclerView.Adapter favorites_recycler_adapter;
     private RecyclerView.LayoutManager favorites_layout_manager;
     private RecyclerView favorites_rv;
@@ -91,6 +87,11 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         favorites_layout_manager = new LinearLayoutManager(this);
         favorites_rv.setLayoutManager(favorites_layout_manager);
         favorites_rv.setAdapter(favorites_recycler_adapter);
+
+        favorites_rv.getItemAnimator().setChangeDuration(350);
+        favorites_rv.getItemAnimator().setMoveDuration(350);
+        favorites_rv.getItemAnimator().setAddDuration(350);
+        favorites_rv.getItemAnimator().setRemoveDuration(350);
     }
 
     @Override
@@ -269,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 return output;
             }
         } catch (Exception e) {
-            Log.d("fragment_parse_excptn", "No worky worky");
+            Log.d("main_act_parse_excptn", "No worky worky");
             Log.d("main_act_request_date", sdf2.format(new Date()));
             Log.d("main_act_response_date", response_date_string);
         }
