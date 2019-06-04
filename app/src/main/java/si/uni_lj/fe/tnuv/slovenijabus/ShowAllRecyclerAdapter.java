@@ -1,6 +1,7 @@
 package si.uni_lj.fe.tnuv.slovenijabus;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +30,7 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
     private int[] mGroupTo, mChildTo, mFirstChildTo;
     private LayoutInflater mInflater;
     private Context mContext;
-    private int expired_color, defaultChildTextColor;
+    private int expired_color, defaultChildTextColor, timetableTextColor;
     private List<LinearLayout> mChildLayouts = new ArrayList<>();
     private RecyclerView recyclerView;
 
@@ -52,7 +54,9 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
         mContext = context;
         mIndex = index;
         expired_color = mContext.getColor(R.color.expiredColor);
+        timetableTextColor = mContext.getColor(R.color.timeTableTextColor);
         defaultChildTextColor = mContext.getColor(android.R.color.secondary_text_light);
+
 
         recyclerView.getItemAnimator().setChangeDuration(500);
         recyclerView.getItemAnimator().setMoveDuration(350);
@@ -78,8 +82,10 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
         ConstraintLayout groupLayout = viewHolder.groupLayout;
         if (i < mIndex) {
             setAllTextColor(groupLayout, expired_color);
+            viewHolder.indicator.setImageTintList(ColorStateList.valueOf(expired_color));
         } else {
             setTextColors(groupLayout, viewHolder.defaultGroupTextColors);
+            viewHolder.indicator.setImageTintList(ColorStateList.valueOf(timetableTextColor));
         }
 
         bindData(groupLayout, group, mGroupFrom, mGroupTo);
@@ -158,6 +164,7 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
             viewHolder.parentLayout.addView(mChildLayouts.get(groupPosition));
 
             mChildLayouts.get(groupPosition).setVisibility(View.VISIBLE);
+            viewHolder.indicator.setImageResource(R.drawable.arrow_down_black);
             recyclerView.scrollToPosition(groupPosition);
             notifyItemChanged(groupPosition, mChildLayouts.get(groupPosition));
         }
@@ -248,12 +255,14 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
         ConstraintLayout groupLayout;
         LinearLayout parentLayout;
         List<Integer> defaultGroupTextColors;
+        ImageView indicator;
 
         public showAllViewHolder(View view) {
             super(view);
             groupLayout = view.findViewById(R.id.show_all_group_viewgroup);
             parentLayout = view.findViewById(R.id.show_all_parentLinearLayout);
             defaultGroupTextColors = getTextColors(groupLayout);
+            indicator = view.findViewById(R.id.expanded_indicator);
 
             groupLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -265,11 +274,14 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
                     } else {
                         if (mChildLayouts.get(i).getVisibility() == View.GONE) {
                             mChildLayouts.get(i).setVisibility(View.VISIBLE);
+
+                            indicator.setImageResource(R.drawable.arrow_down_black);
                             recyclerView.scrollToPosition(i);
                             notifyItemChanged(i, mChildLayouts.get(i));
                             Log.d("showallrecycler", "view set to visible");
                         } else {
                             mChildLayouts.get(i).setVisibility(View.GONE);
+                            indicator.setImageResource(R.drawable.arrow_right_black);
                             notifyItemChanged(i, mChildLayouts.get(i));
                         }
                     }

@@ -15,8 +15,7 @@
         android:orientation="vertical"
         android:id="@+id/show_all_parentLinearLayout">
 
-        <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+        <android.support.constraint.ConstraintLayout
             android:id="@+id/show_all_group_viewgroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -158,6 +157,16 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 app:layout_constraintGuide_percent="0.5" />
+
+            <ImageView
+                android:id="@+id/expanded_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/arrow_right_black"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/guidelineStart" />
 
         </android.support.constraint.ConstraintLayout>
     </LinearLayout>
