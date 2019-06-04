@@ -206,7 +206,7 @@ public class timetableFragment extends Fragment implements DownloadCallback {
 
             showAll_layoutManager = new LinearLayoutManager(getActivity());
 
-
+            showAll_rv.setItemViewCacheSize(30);
             showAll_rv.setLayoutManager(showAll_layoutManager);
             showAll_rv.setAdapter(showAll_recycler_adapter);
             if (first_index == timetable.size()) {

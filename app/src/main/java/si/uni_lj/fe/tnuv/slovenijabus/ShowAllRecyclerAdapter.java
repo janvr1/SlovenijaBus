@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecyclerAdapter.showAllViewHolder> implements DownloadCallback {
     public static final String API_podatki_relacija =
@@ -114,7 +113,7 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
 
     @Override
     public void updateFromDownload(Object res) {
-/*        HashMap<String, Object> result = (HashMap<String, Object>) res;
+        HashMap<String, Object> result = (HashMap<String, Object>) res;
         HashMap<String, String> request = (HashMap<String, String>) result.get("request");
         String result_string = (String) result.get("response");
 
@@ -155,7 +154,13 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
                 childLinearLayout.addView(child);
             }
             mChildLayouts.set(groupPosition, childLinearLayout);
-        }*/
+            showAllViewHolder viewHolder = (showAllViewHolder) recyclerView.findViewHolderForLayoutPosition(groupPosition);
+            viewHolder.parentLayout.addView(mChildLayouts.get(groupPosition));
+
+            mChildLayouts.get(groupPosition).setVisibility(View.VISIBLE);
+            recyclerView.scrollToPosition(groupPosition);
+            notifyItemChanged(groupPosition, mChildLayouts.get(groupPosition));
+        }
     }
 
     public View newChildView(boolean isFirstChild) {
@@ -169,50 +174,7 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
         request.put("data", "flags=" + data);
         request.put("group", Integer.toString(index));
 
-        HashMap<String, Object> result = makeHttpRequest(request);
-        if (result == null) {
-            return;
-        }
-        String result_string = (String) result.get("response");
-
-        int groupPosition = Integer.parseInt(request.get("group"));
-
-        if (result_string.equals("error")) {
-            Toast.makeText(mContext.getApplicationContext(), R.string.network_error_message, Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        ArrayList<HashMap<String, String>> line_data = lineDataParser2(result_string);
-
-        LinearLayout childLinearLayout = new LinearLayout(mContext);
-        childLinearLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        childLinearLayout.setOrientation(LinearLayout.VERTICAL);
-        childLinearLayout.setId(R.id.childLinearLayout);
-        childLinearLayout.setPadding(0, 0, 0, 32);
-        childLinearLayout.setVisibility(View.GONE);
-
-        for (int i = 0; i < line_data.size(); i++) {
-            ConstraintLayout child;
-            HashMap<String, String> hm = line_data.get(i);
-            if (i == 0) {
-                child = (ConstraintLayout) newChildView(true);
-                bindData(child, hm, mFirstChildFrom, mFirstChildTo);
-            } else {
-                child = (ConstraintLayout) newChildView(false);
-                bindData(child, hm, mChildFrom, mChildTo);
-            }
-            if (groupPosition < mIndex) {
-                setAllTextColor(child, expired_color);
-            } else {
-                setAllTextColor(child, defaultChildTextColor);
-            }
-            childLinearLayout.addView(child);
-        }
-        mChildLayouts.set(groupPosition, childLinearLayout);
-        notifyItemChanged(groupPosition, mChildLayouts.get(groupPosition));
-        Log.d("showallrecycler", "line data downloaded");
+        makeHttpRequest(request);
     }
 
 
@@ -300,15 +262,16 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
                     if (mChildLayouts.get(i) == null) {
                         String request_data = mGroupData.get(i).get("line_data");
                         getLineDataFromAPI(request_data, i);
-                    }
-                    if (mChildLayouts.get(i).getVisibility() == View.GONE) {
-                        mChildLayouts.get(i).setVisibility(View.VISIBLE);
-                        recyclerView.scrollToPosition(i);
-                        notifyItemChanged(i, mChildLayouts.get(i));
-                        Log.d("showallrecycler", "view set to visible");
                     } else {
-                        mChildLayouts.get(i).setVisibility(View.GONE);
-                        notifyItemChanged(i, mChildLayouts.get(i));
+                        if (mChildLayouts.get(i).getVisibility() == View.GONE) {
+                            mChildLayouts.get(i).setVisibility(View.VISIBLE);
+                            recyclerView.scrollToPosition(i);
+                            notifyItemChanged(i, mChildLayouts.get(i));
+                            Log.d("showallrecycler", "view set to visible");
+                        } else {
+                            mChildLayouts.get(i).setVisibility(View.GONE);
+                            notifyItemChanged(i, mChildLayouts.get(i));
+                        }
                     }
 
                 }
@@ -316,18 +279,13 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
         }
     }
 
-    public HashMap<String, Object> makeHttpRequest(HashMap<String, String> request) {
+    public void makeHttpRequest(HashMap<String, String> request) {
         NetworkInfo netInfo = getActiveNetworkInfo();
         if (netInfo != null && netInfo.isConnected()) {
-            try {
-                HashMap<String, Object> res = new DownloadAsyncTask(this).execute(request).get(2000, TimeUnit.MILLISECONDS);
-                return res;
-            } catch (Exception e) {
-            }
+            new DownloadAsyncTask(this).execute(request);
         } else {
             Toast.makeText(mContext.getApplicationContext(), R.string.network_error_message, Toast.LENGTH_SHORT).show();
         }
-        return null;
     }
 
     private void setAllTextColor(ViewGroup vg, int color) {
