@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,6 +85,10 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
 
         bindData(groupLayout, group, mGroupFrom, mGroupTo);
 
+        if (childLayout == null && viewHolder.parentLayout.findViewById(R.id.childLinearLayout) != null) {
+            viewHolder.parentLayout.removeView(viewHolder.parentLayout.findViewById(R.id.childLinearLayout));
+        }
+
         if (viewHolder.parentLayout.findViewById(R.id.childLinearLayout) != childLayout &&
                 childLayout != null) {
             viewHolder.parentLayout.removeView(viewHolder.parentLayout.findViewById(R.id.childLinearLayout));
@@ -107,48 +112,9 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
         return mGroupData.size();
     }
 
-
-    public class showAllViewHolder extends RecyclerView.ViewHolder {
-        ConstraintLayout groupLayout;
-        LinearLayout parentLayout;
-        List<Integer> defaultGroupTextColors;
-
-        public showAllViewHolder(View view) {
-            super(view);
-            groupLayout = view.findViewById(R.id.show_all_group_viewgroup);
-            parentLayout = view.findViewById(R.id.show_all_parentLinearLayout);
-            defaultGroupTextColors = getTextColors(groupLayout);
-
-            groupLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int i = getLayoutPosition();
-                    if (mChildLayouts.get(i) == null) {
-                        String request_data = mGroupData.get(i).get("line_data");
-                        getLineDataFromAPI(request_data, i);
-                    }
-                    if (mChildLayouts.get(i).getVisibility() == View.GONE) {
-                        mChildLayouts.get(i).setVisibility(View.VISIBLE);
-                        recyclerView.scrollToPosition(i);
-                        notifyItemChanged(i, mChildLayouts.get(i));
-                    } else {
-                        mChildLayouts.get(i).setVisibility(View.GONE);
-                        notifyItemChanged(i, mChildLayouts.get(i));
-                    }
-
-                }
-            });
-        }
-    }
-
-    public View newChildView(boolean isFirstChild) {
-        return mInflater.inflate((isFirstChild) ? mFirstChildLayout : mChildLayout, null);
-    }
-
-
     @Override
     public void updateFromDownload(Object res) {
-        HashMap<String, Object> result = (HashMap<String, Object>) res;
+/*        HashMap<String, Object> result = (HashMap<String, Object>) res;
         HashMap<String, String> request = (HashMap<String, String>) result.get("request");
         String result_string = (String) result.get("response");
 
@@ -189,14 +155,64 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
                 childLinearLayout.addView(child);
             }
             mChildLayouts.set(groupPosition, childLinearLayout);
-            //mChildLayouts.get(groupPosition).setVisibility(View.VISIBLE);
+        }*/
+    }
 
-            notifyItemChanged(groupPosition, mChildLayouts.get(groupPosition));
-            //recyclerView.scrollToPosition(groupPosition);
-            showAllViewHolder viewHolder = (showAllViewHolder) recyclerView.findViewHolderForAdapterPosition(groupPosition);
-            viewHolder.groupLayout.performClick();
+    public View newChildView(boolean isFirstChild) {
+        return mInflater.inflate((isFirstChild) ? mFirstChildLayout : mChildLayout, null);
+    }
 
+    public void getLineDataFromAPI(String data, int index) {
+        HashMap<String, String> request = new HashMap<>();
+        request.put("url", API_podatki_relacija);
+        request.put("method", "POST");
+        request.put("data", "flags=" + data);
+        request.put("group", Integer.toString(index));
+
+        HashMap<String, Object> result = makeHttpRequest(request);
+        if (result == null) {
+            return;
         }
+        String result_string = (String) result.get("response");
+
+        int groupPosition = Integer.parseInt(request.get("group"));
+
+        if (result_string.equals("error")) {
+            Toast.makeText(mContext.getApplicationContext(), R.string.network_error_message, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        ArrayList<HashMap<String, String>> line_data = lineDataParser2(result_string);
+
+        LinearLayout childLinearLayout = new LinearLayout(mContext);
+        childLinearLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        childLinearLayout.setOrientation(LinearLayout.VERTICAL);
+        childLinearLayout.setId(R.id.childLinearLayout);
+        childLinearLayout.setPadding(0, 0, 0, 32);
+        childLinearLayout.setVisibility(View.GONE);
+
+        for (int i = 0; i < line_data.size(); i++) {
+            ConstraintLayout child;
+            HashMap<String, String> hm = line_data.get(i);
+            if (i == 0) {
+                child = (ConstraintLayout) newChildView(true);
+                bindData(child, hm, mFirstChildFrom, mFirstChildTo);
+            } else {
+                child = (ConstraintLayout) newChildView(false);
+                bindData(child, hm, mChildFrom, mChildTo);
+            }
+            if (groupPosition < mIndex) {
+                setAllTextColor(child, expired_color);
+            } else {
+                setAllTextColor(child, defaultChildTextColor);
+            }
+            childLinearLayout.addView(child);
+        }
+        mChildLayouts.set(groupPosition, childLinearLayout);
+        notifyItemChanged(groupPosition, mChildLayouts.get(groupPosition));
+        Log.d("showallrecycler", "line data downloaded");
     }
 
 
@@ -266,55 +282,38 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
 
     }
 
-    public void getLineDataFromAPI(String data, int index) {
-        HashMap<String, String> request = new HashMap<>();
-        request.put("url", API_podatki_relacija);
-        request.put("method", "POST");
-        request.put("data", "flags=" + data);
-        request.put("group", Integer.toString(index));
+    public class showAllViewHolder extends RecyclerView.ViewHolder {
+        ConstraintLayout groupLayout;
+        LinearLayout parentLayout;
+        List<Integer> defaultGroupTextColors;
 
-        HashMap<String, Object> result = makeHttpRequest(request);
-        if (result == null) {
-            return;
+        public showAllViewHolder(View view) {
+            super(view);
+            groupLayout = view.findViewById(R.id.show_all_group_viewgroup);
+            parentLayout = view.findViewById(R.id.show_all_parentLinearLayout);
+            defaultGroupTextColors = getTextColors(groupLayout);
+
+            groupLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int i = getLayoutPosition();
+                    if (mChildLayouts.get(i) == null) {
+                        String request_data = mGroupData.get(i).get("line_data");
+                        getLineDataFromAPI(request_data, i);
+                    }
+                    if (mChildLayouts.get(i).getVisibility() == View.GONE) {
+                        mChildLayouts.get(i).setVisibility(View.VISIBLE);
+                        recyclerView.scrollToPosition(i);
+                        notifyItemChanged(i, mChildLayouts.get(i));
+                        Log.d("showallrecycler", "view set to visible");
+                    } else {
+                        mChildLayouts.get(i).setVisibility(View.GONE);
+                        notifyItemChanged(i, mChildLayouts.get(i));
+                    }
+
+                }
+            });
         }
-        String result_string = (String) result.get("response");
-
-        int groupPosition = Integer.parseInt(request.get("group"));
-
-        if (result_string.equals("error")) {
-            Toast.makeText(mContext.getApplicationContext(), R.string.network_error_message, Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        ArrayList<HashMap<String, String>> line_data = lineDataParser2(result_string);
-
-        LinearLayout childLinearLayout = new LinearLayout(mContext);
-        childLinearLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        childLinearLayout.setOrientation(LinearLayout.VERTICAL);
-        childLinearLayout.setId(R.id.childLinearLayout);
-        childLinearLayout.setPadding(0, 0, 0, 32);
-        childLinearLayout.setVisibility(View.GONE);
-
-        for (int i = 0; i < line_data.size(); i++) {
-            ConstraintLayout child;
-            HashMap<String, String> hm = line_data.get(i);
-            if (i == 0) {
-                child = (ConstraintLayout) newChildView(true);
-                bindData(child, hm, mFirstChildFrom, mFirstChildTo);
-            } else {
-                child = (ConstraintLayout) newChildView(false);
-                bindData(child, hm, mChildFrom, mChildTo);
-            }
-            if (groupPosition < mIndex) {
-                setAllTextColor(child, expired_color);
-            } else {
-                setAllTextColor(child, defaultChildTextColor);
-            }
-            childLinearLayout.addView(child);
-        }
-        mChildLayouts.set(groupPosition, childLinearLayout);
     }
 
     public HashMap<String, Object> makeHttpRequest(HashMap<String, String> request) {
