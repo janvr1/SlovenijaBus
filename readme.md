@@ -1,5 +1,6 @@
 ### Stvari za implementacijo:
 * Popravit main screen v landscape orientaciji (drugačen layout za landscape?)
+* Urejanje vrstnega reda v favorites
 * Dizajn
 * Tretji screen
 * Dodat en shortcut da ponoviš zadnje iskanje?

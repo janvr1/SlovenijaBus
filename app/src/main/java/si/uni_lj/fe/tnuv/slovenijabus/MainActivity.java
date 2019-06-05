@@ -97,6 +97,10 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     @Override
     protected void onStart() {
         super.onStart();
+        Calendar calendar = Calendar.getInstance();
+        year = calendar.get(Calendar.YEAR);
+        month = calendar.get(Calendar.MONTH); // hint: Android šteje mesece od 0
+        day = calendar.get(Calendar.DAY_OF_MONTH);
         updateFavorites();
     }
 

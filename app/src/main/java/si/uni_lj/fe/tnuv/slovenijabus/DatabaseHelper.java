@@ -91,7 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return favorites;
     }
 
-    public boolean checkIfIn(String entry, String exit) {
+    public boolean checkIfInFavorites(String entry, String exit) {
         if (entry == null || exit == null) {
             return false;
         }

@@ -91,7 +91,7 @@ public class showAllActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        if (slovenijabus_DB.checkIfIn(entryName, exitName)) {
+        if (slovenijabus_DB.checkIfInFavorites(entryName, exitName)) {
             ImageButton fav_btn = findViewById(R.id.favorite_button);
             fav_btn.setImageResource(R.drawable.heart_full_white);
         }
@@ -112,7 +112,7 @@ public class showAllActivity extends AppCompatActivity {
         String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
         String entryName = slovenijabus_DB.getStationNameFromID(entryStationID);
         String exitName = slovenijabus_DB.getStationNameFromID(exitStationID);
-        boolean isIn = slovenijabus_DB.checkIfIn(entryName, exitName);
+        boolean isIn = slovenijabus_DB.checkIfInFavorites(entryName, exitName);
 
         ImageButton fav_btn = findViewById(R.id.favorite_button);
 
