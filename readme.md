@@ -1,4 +1,5 @@
 ### Stvari za implementacijo:
+* Povpravit crash ko dodaš null/null postaje med favorites
 * Popravit main screen v landscape orientaciji (drugačen layout za landscape?)
 * Urejanje vrstnega reda v favorites
 * Dizajn
