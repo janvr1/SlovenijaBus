@@ -164,7 +164,8 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
             viewHolder.parentLayout.addView(mChildLayouts.get(groupPosition));
 
             mChildLayouts.get(groupPosition).setVisibility(View.VISIBLE);
-            viewHolder.indicator.setImageResource(R.drawable.arrow_down_black);
+            //viewHolder.indicator.setImageResource(R.drawable.arrow_down_black);
+            viewHolder.indicator.animate().rotationBy(90);
             recyclerView.scrollToPosition(groupPosition);
             notifyItemChanged(groupPosition, mChildLayouts.get(groupPosition));
         }
@@ -275,13 +276,15 @@ public class ShowAllRecyclerAdapter extends RecyclerView.Adapter<ShowAllRecycler
                         if (mChildLayouts.get(i).getVisibility() == View.GONE) {
                             mChildLayouts.get(i).setVisibility(View.VISIBLE);
 
-                            indicator.setImageResource(R.drawable.arrow_down_black);
+                            //indicator.setImageResource(R.drawable.arrow_down_black);
+                            indicator.animate().rotationBy(90).setDuration(350);
                             recyclerView.scrollToPosition(i);
                             notifyItemChanged(i, mChildLayouts.get(i));
                             Log.d("showallrecycler", "view set to visible");
                         } else {
                             mChildLayouts.get(i).setVisibility(View.GONE);
-                            indicator.setImageResource(R.drawable.arrow_right_black);
+                            //indicator.setImageResource(R.drawable.arrow_right_black);
+                            indicator.animate().rotationBy(-90).setDuration(350);
                             notifyItemChanged(i, mChildLayouts.get(i));
                         }
                     }
