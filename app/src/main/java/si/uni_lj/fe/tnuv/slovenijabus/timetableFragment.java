@@ -72,6 +72,7 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         }
         if (invalid_station) {
             showAll_rv.setVisibility(View.GONE);
+
             msg_fullscreen.setText(R.string.invalid_station_message);
             msg_fullscreen.setVisibility(View.VISIBLE);
         } else {

@@ -22,6 +22,7 @@ import java.util.List;
 public class showAllActivity extends AppCompatActivity {
 
     DatabaseHelper slovenijabus_DB;
+    boolean invalid_station;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class showAllActivity extends AppCompatActivity {
         String date = intent.getStringExtra(MainActivity.EXTRA_DATE);
         String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
         String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
-        boolean invalid_station;
+
         invalid_station = entryStationID == null || exitStationID == null;
 
         //String request_data = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date;
@@ -107,6 +108,10 @@ public class showAllActivity extends AppCompatActivity {
 
 
     public void favoritesButton(View view) {
+        if (invalid_station) {
+            Toast.makeText(this, getString(R.string.invalid_station_name), Toast.LENGTH_LONG).show();
+            return;
+        }
         Intent intent = getIntent();
         String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
         String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
@@ -128,6 +133,10 @@ public class showAllActivity extends AppCompatActivity {
     }
 
     public void changeDirection(View view) {
+        if (invalid_station) {
+            Toast.makeText(this, getString(R.string.invalid_station_name), Toast.LENGTH_LONG).show();
+            return;
+        }
         Intent intent = getIntent();
         String date = intent.getStringExtra(MainActivity.EXTRA_DATE);
         String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
