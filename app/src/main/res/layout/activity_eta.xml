@@ -195,7 +195,6 @@
         android:singleLine="false"
         app:layout_constraintBaseline_toBaselineOf="@+id/krajOdhod"
         app:layout_constraintEnd_toEndOf="@+id/prejsnjiPrihod"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/prejsnjiPrihod" />
 
     <Button

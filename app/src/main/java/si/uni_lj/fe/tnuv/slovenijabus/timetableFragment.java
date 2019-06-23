@@ -103,7 +103,7 @@ public class timetableFragment extends Fragment implements DownloadCallback {
         }
     }
 
-    public HashMap<String, Object> timetableParser(String input) {
+    public static HashMap<String, Object> timetableParser(String input) {
         String[] splitted = input.split("\n");
         ArrayList<HashMap<String, String>> outputTimetable = new ArrayList<>();
         boolean first = true;

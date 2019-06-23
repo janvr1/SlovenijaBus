@@ -4,11 +4,16 @@ package si.uni_lj.fe.tnuv.slovenijabus;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-//import android.util.Log;
-import java.util.ArrayList;
+import android.util.Log;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
@@ -27,6 +32,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class etaActivity extends AppCompatActivity {
 
@@ -56,7 +63,7 @@ public class etaActivity extends AppCompatActivity {
 
     // datum
     private TextView dateView;
-    private int year, month, day, end_day;
+    private int year, month, day;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,15 +84,14 @@ public class etaActivity extends AppCompatActivity {
 
         invalid_station = entryStationID == null || exitStationID == null;
 
-        //String request_data = "VSTOP_ID=" + entryStationID + "&IZSTOP_ID=" + exitStationID + "&DATUM=" + date;
         String request_data = createRequestString(entryStationID, exitStationID, date);
 
-        // Izpis in nastavitev datuma
+        // Izpis in nastavitev datuma v textView
         Calendar calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
         month = calendar.get(Calendar.MONTH); // hint: Android šteje mesece od 0
         day = calendar.get(Calendar.DAY_OF_MONTH);
-        end_day = calendar.get(Calendar.DAY_OF_MONTH) + 14; // Datum za do dva tedna v naprej <—— To ne bo dobr delal, če je do konca meseca manj kot dva tedna ;)
+        //end_day = calendar.get(Calendar.DAY_OF_MONTH) + 14; // Datum za do dva tedna v naprej <—— To ne bo dobr delal, če je do konca meseca manj kot dva tedna ;)
         dateView = findViewById(R.id.datum_vnos_eta);
 
         if (savedInstanceState != null) {
@@ -95,7 +101,7 @@ public class etaActivity extends AppCompatActivity {
         }
 
 
-
+        // Oblikovanje zapisa datuma
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
             Date dateToday = sdf.parse(date); // date1 preimenovan -> dateToday
@@ -105,6 +111,7 @@ public class etaActivity extends AppCompatActivity {
 //            Log.d("parse exception", "something no worky worky");
         }
 
+        // Pridobi ID/imena vstopne in izstopne postaje ter ju izpisi na zaslon
         String entryName = slovenijabus_DB.getStationNameFromID(entryStationID);
         String exitName = slovenijabus_DB.getStationNameFromID(exitStationID);
 
@@ -113,9 +120,34 @@ public class etaActivity extends AppCompatActivity {
         TextView izstop = findViewById(R.id.krajPrihod);
         izstop.setText(exitName);
 
+        // Pridobi podatke iz parserja in ustvari seznam
+        List<HashMap<String, Object>> timetableList = new ArrayList<>();
+        Object tbObject = timetableList.add(timetableFragment.timetableParser(request_data)); //.get("timetable")
+        tbObject.get("timetable");
+
+        HashMap<String, String> busData;
+        busData = timetableList.get(0);
+
+        String departure, arrival, durationEstimate;
+        departure = busData.get("entry_time");
+        arrival = busData.get("exit_time");
+        durationEstimate = busData.get("duration");
+        Log.d("odhod", departure);
+        Log.d("prihod", arrival);
+        Log.d("eta", durationEstimate);
+
+//        for (HashMap<String, String> map : fragmentList){
+//            for (Map.Entry<String, String> mapEntry : map.entrySet()) {
+//                String key = mapEntry.getKey();
+//                Log.d("KEY", key);
+//                String value = mapEntry.getValue();
+//                Log.d("VALUE", value);
+//            }
+//        }
+//        Log.d("LOAD", fragmentList.get(0).get);
 
 
-
+        // Menjaj smer
         final ImageButton swap_direction = findViewById(R.id.zamenjajSmer);
         swap_direction.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,7 +194,6 @@ public class etaActivity extends AppCompatActivity {
 
 
 
-    // Nove funkcije
     @Override
     protected void onStart() {
         super.onStart();
