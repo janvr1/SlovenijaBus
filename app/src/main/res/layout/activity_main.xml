@@ -71,6 +71,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:text="@string/showSingle_button"
+        android:onClick="launchETA"
         android:textColor="@color/colorAccent"
         android:textSize="18sp"
         android:paddingLeft="8dp"

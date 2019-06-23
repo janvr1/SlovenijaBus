@@ -147,6 +147,17 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         startActivity(intent);
     }
 
+    public void launchETA(View view) {
+        String entryStation = entryView.getText().toString();
+        String exitStation = exitView.getText().toString();
+        String date = dateView.getText().toString();
+        Intent intent = new Intent(this, etaActivity.class);
+        intent.putExtra(EXTRA_ENTRY, slovenijabus_DB.getStationIDFromName(entryStation));
+        intent.putExtra(EXTRA_EXIT, slovenijabus_DB.getStationIDFromName(exitStation));
+        intent.putExtra(EXTRA_DATE, date);
+        startActivity(intent);
+    }
+
     public String createRequestString(String vstopID, String izstopID, String datum) {
         String request = "VSTOP_ID=" + vstopID + "&IZSTOP_ID=" + izstopID + "&DATUM=" + datum;
         return request;

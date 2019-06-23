@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_bus_round"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-
+        <activity android:name=".etaActivity"></activity>
         <activity
             android:name=".showAllActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
@@ -26,8 +26,10 @@
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
+
 </manifest>
