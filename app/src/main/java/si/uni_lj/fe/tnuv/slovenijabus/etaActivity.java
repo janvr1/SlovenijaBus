@@ -43,6 +43,10 @@ import java.util.Map;
 //import static si.uni_lj.fe.tnuv.slovenijabus.timetableFragment.timetableParser;
 
 public class etaActivity extends AppCompatActivity { // implements DownloadCallback
+    /**
+     * ŠE NEIMPLEMENTIRAN ACTIVITY (tretja iteracija)
+     * Dostop iz aplikacije ni možen
+     */
 
     /*
     private ProgressBar progressBar;
