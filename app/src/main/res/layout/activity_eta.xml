@@ -6,6 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".etaActivity">
 
+    <!-- Placeholder za gumb za priljubljene -->
+    <ImageButton
+        android:id="@+id/priljubljene"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@android:color/transparent"
+        android:onClick="favoritesButton"
+        android:src="@drawable/heart_empty_white"
+        android:text="@string/favorite"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/trenutenOdhod"
         android:layout_width="wrap_content"

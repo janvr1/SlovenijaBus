@@ -179,6 +179,13 @@ public class etaActivity extends AppCompatActivity { // implements DownloadCallb
 //        Log.d("LOAD", fragmentList.get(0).get);
 
 
+        // Priljubljene
+        if (slovenijabus_DB.checkIfInFavorites(entryName, exitName)) {
+            ImageButton fav_btn = findViewById(R.id.priljubljene);
+            fav_btn.setImageResource(R.drawable.heart_full_white);
+        }
+
+
         // Menjaj smer
         final ImageButton swap_direction = findViewById(R.id.zamenjajSmer);
         swap_direction.setOnClickListener(new View.OnClickListener() {
@@ -426,6 +433,31 @@ public class etaActivity extends AppCompatActivity { // implements DownloadCallb
         newIntent.putExtra(MainActivity.EXTRA_DATE, date);
         startActivity(newIntent);
         finish();
+    }
+
+    public void favoritesButton(View view) {
+        if (invalid_station) {
+            Toast.makeText(this, getString(R.string.invalid_station_name), Toast.LENGTH_LONG).show();
+            return;
+        }
+        Intent intent = getIntent();
+        String entryStationID = intent.getStringExtra(MainActivity.EXTRA_ENTRY);
+        String exitStationID = intent.getStringExtra(MainActivity.EXTRA_EXIT);
+        String entryName = slovenijabus_DB.getStationNameFromID(entryStationID);
+        String exitName = slovenijabus_DB.getStationNameFromID(exitStationID);
+        boolean isIn = slovenijabus_DB.checkIfInFavorites(entryName, exitName);
+
+        ImageButton fav_btn = findViewById(R.id.priljubljene);
+
+        if (isIn) {
+            slovenijabus_DB.removeFavorite(entryName, exitName);
+            fav_btn.setImageResource(R.drawable.heart_empty_white);
+            Toast.makeText(this, getString(R.string.remove_from_favorites), Toast.LENGTH_LONG).show();
+        } else {
+            slovenijabus_DB.addFavorite(entryName, exitName);
+            fav_btn.setImageResource(R.drawable.heart_full_white);
+            Toast.makeText(this, getString(R.string.add_to_favorites), Toast.LENGTH_LONG).show();
+        }
     }
 
     public void launchShowAll(View view) {
