@@ -12,6 +12,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="10\:15"
+        android:textColor="#222222"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/naslednjiOdhod"
         app:layout_constraintEnd_toEndOf="@+id/naslednjiOdhod"
         app:layout_constraintStart_toStartOf="@+id/naslednjiOdhod" />
@@ -21,6 +24,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="10\:26"
+        android:background="@drawable/button_rounded"
+        android:textColor="@color/colorAccent"
+        android:textStyle="normal"
         app:layout_constraintBaseline_toBaselineOf="@+id/prejsnjiOdhod"
         app:layout_constraintEnd_toEndOf="@+id/naslednjiPrihod"
         app:layout_constraintStart_toStartOf="@+id/naslednjiPrihod" />
@@ -31,6 +37,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="10\:00"
+        android:background="@drawable/button_rounded"
+        android:textColor="@color/colorAccent"
+        android:textStyle="normal"
         app:layout_constraintBottom_toTopOf="@+id/trenutenOdhod"
         app:layout_constraintEnd_toEndOf="@+id/naslednjiOdhod"
         app:layout_constraintStart_toStartOf="@+id/naslednjiOdhod" />
@@ -43,6 +52,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="32dp"
+        android:progressDrawable="@drawable/button_rounded"
+        android:progressTint="@color/colorAccent"
         app:layout_constraintBottom_toTopOf="@+id/izpisETA"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -54,6 +65,9 @@
         android:layout_marginEnd="48dp"
         android:layout_marginRight="48dp"
         android:text="10\:57"
+        android:background="@drawable/button_rounded"
+        android:textColor="@color/colorAccent"
+        android:textStyle="normal"
         app:layout_constraintBaseline_toBaselineOf="@+id/naslednjiOdhod"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -64,6 +78,9 @@
         android:layout_marginStart="48dp"
         android:layout_marginBottom="32dp"
         android:text="10\:30"
+        android:background="@drawable/button_rounded"
+        android:textColor="@color/colorAccent"
+        android:textStyle="normal"
         app:layout_constraintBottom_toTopOf="@+id/potETA"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -148,8 +165,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="16dp"
-        android:textStyle="bold"
         android:text="@string/odhod"
+        android:textColor="#222222"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/krajOdhod"
         app:layout_constraintEnd_toEndOf="@+id/krajOdhod"
         app:layout_constraintStart_toStartOf="@+id/krajOdhod"
@@ -159,8 +178,10 @@
         android:id="@+id/postajaPrihod"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
         android:text="@string/prihod"
+        android:textColor="#222222"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/postajaOdhod"
         app:layout_constraintEnd_toEndOf="@+id/krajPrihod"
         app:layout_constraintStart_toStartOf="@+id/krajPrihod" />
@@ -206,6 +227,9 @@
         android:layout_marginBottom="64dp"
         android:onClick="launchShowAll"
         android:text="@string/vozni_red"
+        android:background="@drawable/button_rounded"
+        android:textColor="@color/colorAccent"
+        android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -242,6 +266,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="10\:42"
+        android:textColor="#222222"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/trenutenOdhod"
         app:layout_constraintEnd_toEndOf="@+id/naslednjiPrihod"
         app:layout_constraintStart_toStartOf="@+id/naslednjiPrihod" />
