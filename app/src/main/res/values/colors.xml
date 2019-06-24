@@ -7,4 +7,5 @@
     <color name="bgColor">#FAFAFA</color>
     <color name="expiredColor">#999999</color>
     <color name="timeTableTextColor">#323232</color>
+    <color name="stongTextColor">#323232</color>
 </resources>

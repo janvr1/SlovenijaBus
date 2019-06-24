@@ -377,8 +377,9 @@ public class etaActivity extends AppCompatActivity { // implements DownloadCallb
                 Date request_date = sdf_request.parse(timetableFragment.request_string.split("=")[3]);
                 Date response_date = sdf_response.parse(timetable.get(0).get("date"));
                 if (request_date.before(response_date)) {
-                    msg.setText(getString(R.string.no_buses_on_this_day, sdf_request.format(response_date)));
-                    msg.setVisibility(View.VISIBLE);
+                    Toast.makeText(this, R.string.no_buses_on_this_day, Toast.LENGTH_LONG).show();
+                    //msg.setText(getString(R.string.no_buses_on_this_day, sdf_request.format(response_date)));
+                    //msg.setVisibility(View.VISIBLE);
                 }
             } catch (Exception e) {
 /*                Log.d("fragment_parse_excptn", "No worky worky");
@@ -388,8 +389,8 @@ public class etaActivity extends AppCompatActivity { // implements DownloadCallb
             */
             //showAll_rv.setVisibility(View.VISIBLE);
 
-            String[] parentFromArray = {"entry_time", "exit_time", "duration", "price"};
-            int[] parentToArray = {R.id.entry_time, R.id.exit_time, R.id.duration, R.id.price};
+            String[] parentFromArray = {"entry_time", "exit_time", "duration"};
+            int[] parentToArray = {R.id.trenutenOdhod, R.id.trenutenPrihod, R.id.izpisETA};
         }
     }
 
