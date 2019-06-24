@@ -1,12 +1,16 @@
 package si.uni_lj.fe.tnuv.slovenijabus;
 
 //import android.os.CountDownTimer;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 
 import java.lang.reflect.Array;
@@ -15,6 +19,7 @@ import java.util.HashMap;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -35,7 +40,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class etaActivity extends AppCompatActivity {
+//import static si.uni_lj.fe.tnuv.slovenijabus.timetableFragment.timetableParser;
+
+public class etaActivity extends AppCompatActivity { // implements DownloadCallback
 
     /*
     private ProgressBar progressBar;
@@ -55,11 +62,22 @@ public class etaActivity extends AppCompatActivity {
     private Calendar cal = Calendar.getInstance();
     */
 
+    public static final String API_voznired =
+            "https://www.ap-ljubljana.si/_vozni_red/get_vozni_red_0.php"; // POST request
+
     // postaje
+    public ArrayList<String> station_names = new ArrayList<>();
+    ArrayAdapter<String> adapter;
     DatabaseHelper slovenijabus_DB;
+
+    // API
+    TextView msg;
+    private static final String ARG_REQUEST_STRING = "req_str";
+    private static final String ARG_INVALID_STATION = "invalid_station";
+    public String request_string;
     boolean invalid_station;
-    private AutoCompleteTextView entryView;
-    private AutoCompleteTextView exitView;
+    private TextView entryView;
+    private TextView exitView;
 
     // datum
     private TextView dateView;
@@ -76,6 +94,12 @@ public class etaActivity extends AppCompatActivity {
 
 
         slovenijabus_DB = DatabaseHelper.getInstance(this);
+
+        station_names.addAll(slovenijabus_DB.readStationsNames());
+        entryView = findViewById(R.id.krajOdhod);
+        exitView = findViewById(R.id.krajPrihod);
+        adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, station_names);
 
         Intent intent = getIntent();
         String date = intent.getStringExtra(MainActivity.EXTRA_DATE);
@@ -121,20 +145,24 @@ public class etaActivity extends AppCompatActivity {
         izstop.setText(exitName);
 
         // Pridobi podatke iz parserja in ustvari seznam
-        List<HashMap<String, Object>> timetableList = new ArrayList<>();
-        Object tbObject = timetableList.add(timetableFragment.timetableParser(request_data)); //.get("timetable")
-        tbObject.get("timetable");
 
-        HashMap<String, String> busData;
-        busData = timetableList.get(0);
+        //Log.d("reqData", request_data);
 
-        String departure, arrival, durationEstimate;
-        departure = busData.get("entry_time");
-        arrival = busData.get("exit_time");
-        durationEstimate = busData.get("duration");
-        Log.d("odhod", departure);
-        Log.d("prihod", arrival);
-        Log.d("eta", durationEstimate);
+
+//        List<HashMap<String, String>> timetableList = new ArrayList<>();
+//        timetableList.addAll((ArrayList<HashMap<String, String>>) timetableParser(request_data).get("timetable")); //.get("timetable") Object tbObject = tbObject.get("timetable");
+//
+//
+//        HashMap<String, String> busData;
+//        busData = timetableList.get(0);
+//
+//        String departure, arrival, durationEstimate;
+//        departure = busData.get("entry_time");
+//        arrival = busData.get("exit_time");
+//        durationEstimate = busData.get("duration");
+//        Log.d("odhod", departure);
+//        Log.d("prihod", arrival);
+//        Log.d("eta", durationEstimate);
 
 //        for (HashMap<String, String> map : fragmentList){
 //            for (Map.Entry<String, String> mapEntry : map.entrySet()) {
@@ -156,7 +184,11 @@ public class etaActivity extends AppCompatActivity {
             }
         });
 
-        // ##### STARA KODA - RECIKLIRAJ PO DELIH #####
+        // ##### NEIMPLEMENTIRANA KODA - PROGRESSBAR #####
+        // Poenostavi na navaden timer
+        // predviden cas voznje (duration) vrne stevilo segmentov vrstice napredka
+        // poglej razliko med trenutnim casom in casom odhoda - to odstej od zacetnega casa voznje
+        // inicializiraj na primerni vrednosti in pozeni odstevalnik casa - z odstevanjem casa se polni vrstica napredka
         /*
         trenuten_cas_l = cal.getTime();
         trenuten_cas = (int)(trenuten_cas_l % Integer.MAX_VALUE);
@@ -220,10 +252,158 @@ public class etaActivity extends AppCompatActivity {
         return day + "." + month + "." + year;
     }
 
-
     public String createRequestString(String vstopID, String izstopID, String datum) {
         String request = "VSTOP_ID=" + vstopID + "&IZSTOP_ID=" + izstopID + "&DATUM=" + datum;
         return request;
+    }
+
+    public void makeHttpRequest(HashMap<String, String> request) {
+        NetworkInfo netInfo = getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnected()) {
+            new DownloadAsyncTask().execute(request);
+        } else {
+            Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void getTimetablesFromAPI(String data) {
+        HashMap<String, String> request = new HashMap<>();
+        request.put("url", API_voznired);
+        request.put("method", "POST");
+        request.put("data", data);
+
+        makeHttpRequest(request);
+    }
+
+    public static HashMap<String, Object> timetableParser(String input) {
+        String[] splitted = input.split("\n");
+        ArrayList<HashMap<String, String>> outputTimetable = new ArrayList<>();
+        boolean first = true;
+        int first_index = 0;
+        for (int i = 0; i < splitted.length; i++) {
+            String s = splitted[i];
+            String[] separated = s.split("\\|");
+            String time_str = separated[6].substring(0, separated[6].length() - 3);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            String now = sdf.format(new Date());
+
+            if (now.compareTo(time_str) < 1 && first) {
+                first = false;
+                first_index = i;
+            }
+            HashMap<String, String> timetable = new HashMap<>();
+            timetable.put("entry_time", separated[6].substring(11, 16).replaceFirst("^0+(?!$)", ""));
+            timetable.put("exit_time", separated[7].substring(11, 16).replaceFirst("^0+(?!$)", ""));
+            timetable.put("date", separated[6].substring(0, 10));
+            timetable.put("entry_time_long", separated[6]);
+            timetable.put("exit_time_long", separated[7]);
+            timetable.put("duration", separated[8]);
+            timetable.put("price", separated[9].replace(".", ",") + " €");
+            timetable.put("line_data", separated[13]);
+            outputTimetable.add(timetable);
+        }
+        if (first) {
+            first_index = outputTimetable.size();
+        }
+
+        HashMap<String, Object> output = new HashMap<>();
+        output.put("timetable", outputTimetable);
+        output.put("index", first_index);
+        return output;
+    }
+
+    public void updateFromDownload(Object res) {
+        HashMap<String, Object> result = (HashMap<String, Object>) res;
+        HashMap<String, String> request = (HashMap<String, String>) result.get("request");
+        String result_string = (String) result.get("response");
+
+        if (result.get("response").equals("error")) {
+            Toast.makeText(this, R.string.network_error_message, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (request.get("url").equals(API_voznired)) {
+
+            if (result_string.equals("error")) {
+                return;
+            }
+
+            if (result_string.length() < 2) {
+                Toast.makeText(this, R.string.no_buses_message, Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            List<HashMap<String, String>> timetableList = new ArrayList<>();
+            timetableList.addAll((ArrayList<HashMap<String, String>>) timetableParser(result_string).get("timetable")); //.get("timetable") Object tbObject = tbObject.get("timetable");
+            String departure, arrival, durationEstimate;
+
+
+            HashMap<String, String> busData;
+            for (int i = 0; i < timetableList.size(); i++)
+            {
+                busData = timetableList.get(i);
+
+                departure = busData.get("entry_time");
+                arrival = busData.get("exit_time");
+                durationEstimate = busData.get("duration");
+            }
+            busData = timetableList.get(0);
+
+
+
+            HashMap<String, Object> data = timetableParser(result_string);
+            int first_index = (int) data.get("index");
+            ArrayList<HashMap<String, String>> timetable = (ArrayList<HashMap<String, String>>) data.get("timetable");
+
+            SimpleDateFormat sdf_request = new SimpleDateFormat("dd.MM.yyyy");
+            SimpleDateFormat sdf_response = new SimpleDateFormat("yyyy-MM-dd");
+
+
+
+            /*
+            try {
+                Date request_date = sdf_request.parse(timetableFragment.request_string.split("=")[3]);
+                Date response_date = sdf_response.parse(timetable.get(0).get("date"));
+                if (request_date.before(response_date)) {
+                    msg.setText(getString(R.string.no_buses_on_this_day, sdf_request.format(response_date)));
+                    msg.setVisibility(View.VISIBLE);
+                }
+            } catch (Exception e) {
+/*                Log.d("fragment_parse_excptn", "No worky worky");
+                Log.d("fragment_request_date", request_string.split("=")[3]);
+                Log.d("fragment_response_date", timetable.get(0).get("date"));*
+            }
+            */
+            //showAll_rv.setVisibility(View.VISIBLE);
+
+            String[] parentFromArray = {"entry_time", "exit_time", "duration", "price"};
+            int[] parentToArray = {R.id.entry_time, R.id.exit_time, R.id.duration, R.id.price};
+        }
+    }
+
+    public void getNext3Buses(int i, String data) {
+        HashMap<String, String> request = new HashMap<>();
+        request.put("url", MainActivity.API_voznired);
+        request.put("method", "POST");
+        request.put("data", data);
+        request.put("index", Integer.toString(i));
+        Log.d("request_data", data);
+        makeHttpRequest(request);
+    }
+
+    public void getStationsFromAPI() {
+        HashMap<String, String> req = new HashMap<>();
+        req.put("url", MainActivity.API_postaje);
+        req.put("method", "GET");
+        makeHttpRequest(req);
+    }
+
+    public NetworkInfo getActiveNetworkInfo() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo;
     }
 
     public void changeDirection(View view) {
