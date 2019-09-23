@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
     public ArrayList<String> station_names = new ArrayList<>();
     ArrayAdapter<String> adapter;
     DatabaseHelper slovenijabus_DB;
-    private int year, month, day, end_day;
+    private int year, month, day;
     private TextView dateView;
     private AutoCompleteTextView entryView;
     private AutoCompleteTextView exitView;
@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         year = calendar.get(Calendar.YEAR);
         month = calendar.get(Calendar.MONTH); // hint: Android šteje mesece od 0
         day = calendar.get(Calendar.DAY_OF_MONTH);
-        end_day = calendar.get(Calendar.DAY_OF_MONTH) + 14; // Datum za do dva tedna v naprej <—— To ne bo dobr delal, če je do konca meseca manj kot dva tedna ;)
 
         dateView = findViewById(R.id.datum_vnos);
 
@@ -285,9 +284,9 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 return output;
             }
         } catch (Exception e) {
-            Log.d("main_act_parse_excptn", "No worky worky");
+            /*Log.d("main_act_parse_excptn", "No worky worky");
             Log.d("main_act_request_date", sdf2.format(new Date()));
-            Log.d("main_act_response_date", response_date_string);
+            Log.d("main_act_response_date", response_date_string);*/
         }
 
         for (int i = 0, j = 0; i < splitted.length && j < 3; i++) {
