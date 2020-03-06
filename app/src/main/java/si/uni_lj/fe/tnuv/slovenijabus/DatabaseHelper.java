@@ -109,12 +109,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_NAME_STATIONS, null, null);
 
+        db.beginTransaction();
         for (String id : station_map.keySet()) {
             ContentValues values = new ContentValues();
             values.put("station_id", id);
             values.put("station_name", station_map.get(id));
             db.insert(TABLE_NAME_STATIONS, null, values);
         }
+        db.setTransactionSuccessful();
+        db.endTransaction();
         db.close();
     }
 

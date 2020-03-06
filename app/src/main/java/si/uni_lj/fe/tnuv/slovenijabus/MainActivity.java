@@ -211,6 +211,8 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
             return;
         }
 
+
+
         if (request.get("url").equals(API_postaje)) {
             Map<String, String> stations = stationParser(result_string);
             slovenijabus_DB.updateStations(stations);
@@ -231,7 +233,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
 
             if (request.containsKey("index")) {
                 int index = Integer.parseInt(request.get("index"));
-                Log.d("favorites_index", request.get("index"));
                 ArrayList<String> next_buses = timetableParserFavorites(result_string);
                 boolean change = false;
 
@@ -300,7 +301,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
                 j++;
             }
         }
-        Log.d("timetableparser", output.toString());
         return output;
     }
 
@@ -310,7 +310,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         request.put("method", "POST");
         request.put("data", data);
         request.put("index", Integer.toString(i));
-        Log.d("request_data", data);
         makeHttpRequest(request);
     }
 
