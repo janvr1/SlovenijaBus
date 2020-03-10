@@ -9,7 +9,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -140,17 +139,6 @@ public class MainActivity extends AppCompatActivity implements DownloadCallback 
         String exitStation = exitView.getText().toString();
         String date = dateView.getText().toString();
         Intent intent = new Intent(this, showAllActivity.class);
-        intent.putExtra(EXTRA_ENTRY, slovenijabus_DB.getStationIDFromName(entryStation));
-        intent.putExtra(EXTRA_EXIT, slovenijabus_DB.getStationIDFromName(exitStation));
-        intent.putExtra(EXTRA_DATE, date);
-        startActivity(intent);
-    }
-
-    public void launchETA(View view) {
-        String entryStation = entryView.getText().toString();
-        String exitStation = exitView.getText().toString();
-        String date = dateView.getText().toString();
-        Intent intent = new Intent(this, etaActivity.class);
         intent.putExtra(EXTRA_ENTRY, slovenijabus_DB.getStationIDFromName(entryStation));
         intent.putExtra(EXTRA_EXIT, slovenijabus_DB.getStationIDFromName(exitStation));
         intent.putExtra(EXTRA_DATE, date);
